@@ -47,18 +47,22 @@ text-align: center;
 }
 
 h5 {
-color:#fff;
+color:#154f55;
 font-weight: bold;
 font-size: 1.25rem;
 text-align: center;
 margin-top: 1rem;
+font-size:200%;
+font-weight: 1200;
 }
 
 h6 {
-color:#e8f6f4;
+color:#1c2a2d;
 text-align: center;
 font-size: 0.875rem;
 margin-top: 0.5rem;
+font-size: larger;
+font-weight: 700;
 }
 
 p {
@@ -554,4 +558,57 @@ img {
 @keyframes reverseGradient {
 0% { background-position: 0% 50%; }
 100% { background-position: 100% 50%; }
+}
+
+/* Add to your existing CSS - Active navbar link style */
+.navbar-toplink.active {
+  background-color: rgba(202, 202, 202, 0.445); /* Uses your theme's orange color */
+  color: white;
+  box-shadow: 0 4px 12px rgba(201, 201, 201, 0.3);
+}
+
+/* Optional: Add hover state for active link */
+.navbar-toplink.active:hover {
+  background-color: rgba(255, 255, 255, 0.507);
+  transform: scale(1.05);
+}
+
+.button {
+background: #f06a4d;
+color: white;
+padding: 0.6rem 1.5rem;
+border-radius: 999px;
+font-weight: 600;
+letter-spacing: 0.3px;
+box-shadow: 0 8px 20px rgba(240,106,77,0.35);
+transition: all 0.25s ease;
+display: inline-block;
+text-decoration: none;
+}
+
+.button:hover {
+background: #ff7c5f;
+transform: translateY(-2px);
+box-shadow: 0 14px 30px rgba(240,106,77,0.45);
+}
+
+
+.button:hover {
+animation: forwardGradient 0.4s ease-in forwards;
+transform: scale(1.04);
+}
+
+.link {
+    text-decoration: underline;
+    color:#f06a4d;
+    font-size:larger;
+    font-weight: 500;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.link:hover {
+    transform: translateY(-2px);
+    transform: scale(1.04);
+    color:#ff7c5f;
 }

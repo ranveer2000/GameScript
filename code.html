@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>GameScript - blog</title>
+  <link rel="icon" type="image/svg" href="assets/images/logo.svg">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="main.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/trianglify@4/dist/trianglify.min.js"></script>
+</head>
+<body class="flex flex-col min-h-screen">
+
+<!-- Navbar -->
+<header class="navbar-bar">
+  <div class="navbar-content container mx-auto flex items-center justify-between p-4 flex-wrap">
+    <a href="index.html" class="flex items-center space-x-2">
+      <img src="assets/images/logo.png" alt="Logo" class="h-12 w-12 md:h-20 md:w-20 object-contain">
+    </a>
+    <button id="menu-btn" class="md:hidden focus:outline-none">
+    </button>
+    <nav class="navbar-links hidden md:flex flex-wrap justify-evenly text-base md:text-xl font-semibold w-full md:w-auto mt-4 md:mt-0 space-y-2 md:space-y-0 md:space-x-4">
+      <a href="index.html" class="navbar-toplink">Home</a>
+      <a href="install.html" class="navbar-toplink">Install</a>
+      <a href="play.html" class="navbar-toplink">Play</a>
+      <a href="syntax.html" class="navbar-toplink">Syntax</a>
+      <a href="blog.html" class="navbar-toplink">Blog</a>
+    </nav>
+  </div>
+</header>
+
+<main class="w-full px-4 md:px-8">
+  <!-- PATTERN 2: Full width card (NO images) -->
+  <!-- |-------------------------| -->
+  <div class="card-full">
+    <div class="card-content">
+      <h5>Coding it (March 2026)</h5>
+      <p>This is when I actually started to code the language itself <br> I first made a simple language using C++, called 'hoax' as a code name I guess <br> Then I created a language 'semi' using hoax to create a semi-matured langauge <br> Then I finally am working on the compiler for .gs using 'semi' <br> This has been the biggest breakthrough to code my language but is taking a lot of time and energy <br> I am happy to use my time though, I have been enjoying making this language <br> I've finalized my langauge's syntax which should be visible in the 'syntax' tab in no time <br> I'll keep working on this language and the 'Home' will let you know when it's usable <br> This is my biggest project yet in all of my programming years so wish me luck <br> Have a nice day!</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Bottom Bar -->
+<footer class="bot-bar mt-10">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col items-center text-center space-y-4">
+    <img src="assets/images/logo.png" alt="logo" class="pt-6 h-24 w-24 md:h-40 md:w-40 object-contain rounded-full">
+    <h1 class="text-2xl font-bold text-white">GameScript</h1>
+    <p class="text-sm text-white">&copy; 2026 GameScript. All rights reserved.</p>
+    <h1 class="text-sm text-white">A Language by Ranveer Singh</h1>
+  </div>
+</footer>
+
+</body>
+</html>
