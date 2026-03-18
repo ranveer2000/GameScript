@@ -17,7 +17,6 @@
       align-items: flex-start;
     }
 
-    /* Thin left panel */
     .syntax-nav {
       width: 220px;
       flex-shrink: 0;
@@ -43,17 +42,9 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
+    .syntax-nav-item:hover { background: rgba(240,106,77,0.08); }
+    .syntax-nav-item.active { background: #f06a4d; color: white; }
 
-    .syntax-nav-item:hover {
-      background: rgba(240,106,77,0.08);
-    }
-
-    .syntax-nav-item.active {
-      background: #f06a4d;
-      color: white;
-    }
-
-    /* Thick right panel */
     .syntax-content {
       flex: 1;
       min-width: 0;
@@ -67,13 +58,43 @@
       color: #154f55;
       font-size: 1.4rem;
       font-weight: 700;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .intro-box {
+      background: #f0f9f9;
+      border-left: 4px solid #3fafa4;
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #3fafa4;
+      margin: 1.5rem 0 0.4rem;
     }
 
     .syntax-content p {
       color: #555;
-      margin-bottom: 1.25rem;
+      margin-bottom: 0.75rem;
       font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: #f0f0f0;
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88em;
+      color: #154f55;
     }
 
     .code-block {
@@ -84,23 +105,53 @@
       font-size: 0.9rem;
       line-height: 1.7;
       color: #d4d4d4;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.75rem;
       overflow-x: auto;
       white-space: pre;
     }
 
-    /* Syntax highlighting colours */
-    .kw  { color: #c792ea; } /* keywords */
-    .ty  { color: #82aaff; } /* types */
-    .st  { color: #c3e88d; } /* strings */
-    .nm  { color: #f78c6c; } /* numbers */
-    .cm  { color: #546e7a; font-style: italic; } /* comments */
-    .fn  { color: #82aaff; } /* function names */
-    .op  { color: #89ddff; } /* operators */
+    .output-box {
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 0.85rem 1.25rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88rem;
+      color: #d4d4d4;
+      margin-bottom: 1.25rem;
+      border-left: 3px solid #3fafa4;
+    }
+    .output-box .out-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3fafa4;
+      margin-bottom: 0.4rem;
+    }
+    .output-box .out-line { color: #c3e88d; }
+
+    .tip-box {
+      background: #fff8f0;
+      border-left: 4px solid #f06a4d;
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.25rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.6;
+    }
+    .tip-box strong { color: #f06a4d; }
+
+    .kw  { color: #c792ea; }
+    .ty  { color: #82aaff; }
+    .st  { color: #c3e88d; }
+    .nm  { color: #f78c6c; }
+    .cm  { color: #546e7a; font-style: italic; }
+    .fn  { color: #82aaff; }
+    .op  { color: #89ddff; }
 
     .try-btn {
       display: inline-block;
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
       padding: 0.5rem 1.25rem;
       background: #f06a4d;
       color: white;
@@ -111,31 +162,36 @@
       transition: opacity 0.15s;
     }
     .try-btn:hover { opacity: 0.85; }
-    @media (max-width: 768px) {
-  .playground-container,
-  .syntax-layout {
-    flex-direction: column;
+
+    .content-divider {
+      border: none;
+      border-top: 1px solid #f0f0f0;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 480px) {
+  .syntax-content {
+    padding: 1.25rem;
   }
 
-  .syntax-nav {
+  .code-block, .output-box {
+    font-size: 0.78rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .try-btn {
     width: 100%;
-    position: static;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    padding: 0.5rem;
+    text-align: center;
+    display: block;
+    box-sizing: border-box;
   }
 
   .syntax-nav-item {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-  }
-
-  .CodeMirror,
-  .output-content {
-    height: 300px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
   }
 }
+    
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -157,10 +213,8 @@
 </header>
 
 <main class="w-full px-4 md:px-8">
-
   <div class="syntax-layout">
 
-    <!-- Left: nav -->
     <div class="syntax-nav">
       <button class="syntax-nav-item active" data-section="variables">Variables</button>
       <button class="syntax-nav-item" data-section="arithmetic">Arithmetic</button>
@@ -172,16 +226,13 @@
       <button class="syntax-nav-item" data-section="dicts">Dicts</button>
       <button class="syntax-nav-item" data-section="functions">Functions</button>
       <button class="syntax-nav-item" data-section="trycatch">Try / Catch</button>
+      <button class="syntax-nav-item" data-section="input">Input (take)</button>
       <button class="syntax-nav-item" data-section="misc">Misc</button>
     </div>
 
-    <!-- Right: content -->
-    <div class="syntax-content" id="syntax-content">
-      <!-- filled by JS -->
-    </div>
+    <div class="syntax-content" id="syntax-content"></div>
 
   </div>
-
 </main>
 
 <footer class="bot-bar mt-10">
@@ -195,171 +246,477 @@
 
 <script>
 const sections = {
+
   variables: {
     title: 'Variables',
-    desc: 'GameScript is statically typed. Every variable needs a type keyword.',
-    code: `<span class="kw">int</span>  x = <span class="nm">10</span>
-<span class="kw">dec</span>  y = <span class="nm">3.14</span>
+    intro: 'A variable is a named box that holds a value. In GameScript, you always say what <em>type</em> of value the box will hold before you name it.',
+    blocks: [
+      {
+        label: 'The 4 basic types',
+        explain: '<code>int</code> stores whole numbers, <code>dec</code> stores decimals, <code>word</code> stores text, and <code>bool</code> stores <code>true</code> or <code>false</code>.',
+        code: `<span class="kw">int</span>  age  = <span class="nm">18</span>
+<span class="kw">dec</span>  pi   = <span class="nm">3.14</span>
 <span class="kw">word</span> name = <span class="st">"GameScript"</span>
-<span class="kw">bool</span> flag = <span class="kw">true</span>`,
-    example: `int x = 10\nword name = "GameScript"\nprint(x)\nprint(name)`
+<span class="kw">bool</span> on   = <span class="kw">true</span>
+<span class="fn">print</span>(age)
+<span class="fn">print</span>(pi)
+<span class="fn">print</span>(name)
+<span class="fn">print</span>(on)`,
+        output: ['18', '3.14', 'GameScript', 'true'],
+        example: `int age = 18\ndec pi = 3.14\nword name = "GameScript"\nbool on = true\nprint(age)\nprint(pi)\nprint(name)\nprint(on)`
+      },
+      {
+        label: 'Changing a variable',
+        explain: 'Once declared, reassign a variable just by writing its name — no type keyword needed again.',
+        code: `<span class="kw">int</span> x = <span class="nm">5</span>
+x = <span class="nm">10</span>
+<span class="fn">print</span>(x)`,
+        output: ['10'],
+        example: `int x = 5\nx = 10\nprint(x)`
+      }
+    ],
+    tip: 'You only write the type keyword (<code>int</code>, <code>word</code>, etc.) the <strong>first time</strong> you declare the variable. After that, just use the name.'
   },
 
   arithmetic: {
     title: 'Arithmetic',
-    desc: 'Standard operators plus exponent and modulo.',
-    code: `<span class="kw">int</span> sum  = <span class="nm">2</span> <span class="op">+</span> <span class="nm">3</span>
-<span class="kw">int</span> diff = <span class="nm">10</span> <span class="op">-</span> <span class="nm">4</span>
-<span class="kw">int</span> prod = <span class="nm">3</span> <span class="op">*</span> <span class="nm">4</span>
-<span class="kw">int</span> quot = <span class="nm">10</span> <span class="op">/</span> <span class="nm">2</span>
-<span class="kw">int</span> rem  = <span class="nm">7</span> <span class="op">%</span> <span class="nm">3</span>
-<span class="kw">dec</span> pw   = <span class="nm">2.0</span> <span class="op">**</span> <span class="nm">8</span>`,
-    example: `int sum = 2 + 3\ndec pw = 2.0 ** 8\nprint(sum)\nprint(pw)`
+    intro: 'GameScript supports all the common maths operators. You can use them directly in expressions or store the result in a variable.',
+    blocks: [
+      {
+        label: 'Basic operators',
+        explain: '<code>+</code> adds, <code>-</code> subtracts, <code>*</code> multiplies, <code>/</code> divides, <code>%</code> gives the remainder (modulo).',
+        code: `<span class="fn">print</span>(<span class="nm">2</span> <span class="op">+</span> <span class="nm">3</span>)
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">-</span> <span class="nm">4</span>)
+<span class="fn">print</span>(<span class="nm">3</span> <span class="op">*</span> <span class="nm">4</span>)
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">/</span> <span class="nm">2</span>)
+<span class="fn">print</span>(<span class="nm">7</span> <span class="op">%</span> <span class="nm">3</span>)`,
+        output: ['5', '6', '12', '5', '1'],
+        example: `print(2 + 3)\nprint(10 - 4)\nprint(3 * 4)\nprint(10 / 2)\nprint(7 % 3)`
+      },
+      {
+        label: 'Exponent **',
+        explain: '<code>**</code> raises a number to a power. <code>2 ** 8</code> means 2 to the power of 8, which is 256.',
+        code: `<span class="kw">dec</span> result = <span class="nm">2.0</span> <span class="op">**</span> <span class="nm">8</span>
+<span class="fn">print</span>(result)`,
+        output: ['256'],
+        example: `dec result = 2.0 ** 8\nprint(result)`
+      }
+    ],
+    tip: 'Use <code>int</code> for whole number results and <code>dec</code> when you expect decimals.'
   },
 
   strings: {
     title: 'Strings',
-    desc: 'Use curly braces for interpolation. Prefix with p for a pure (raw) string.',
-    code: `<span class="kw">word</span> name = <span class="st">"GameScript"</span>
-<span class="kw">word</span> msg  = <span class="st">"Hello {name}!"</span>    <span class="cm"># interpolated</span>
-<span class="kw">word</span> raw  = <span class="kw">p</span><span class="st">"{name} is literal"</span>  <span class="cm"># no interpolation</span>`,
-    example: `word name = "GameScript"\nword msg = "Hello {name}!"\nword raw = p"{name} is literal"\nprint(msg)\nprint(raw)`
+    intro: 'A string (called <code>word</code> in GameScript) is a piece of text. Wrap it in double quotes. You can embed variable values directly inside a string using <code>{}</code>.',
+    blocks: [
+      {
+        label: 'Basic string',
+        explain: 'Wrap text in double quotes and assign it to a <code>word</code> variable.',
+        code: `<span class="kw">word</span> greeting = <span class="st">"Hello, world!"</span>
+<span class="fn">print</span>(greeting)`,
+        output: ['Hello, world!'],
+        example: `word greeting = "Hello, world!"\nprint(greeting)`
+      },
+      {
+        label: 'String interpolation',
+        explain: 'Put a variable name inside <code>{}</code> inside a string — GameScript replaces it with its value automatically.',
+        code: `<span class="kw">word</span> name = <span class="st">"Ranveer"</span>
+<span class="kw">int</span>  age  = <span class="nm">17</span>
+<span class="fn">print</span>(<span class="st">"My name is {name} and I am {age}."</span>)`,
+        output: ['My name is Ranveer and I am 17.'],
+        example: `word name = "Ranveer"\nint age = 17\nprint("My name is {name} and I am {age}.")`
+      },
+      {
+        label: 'Pure string — no interpolation',
+        explain: 'Add a <code>p</code> before the opening quote to treat curly braces as literal text.',
+        code: `<span class="kw">word</span> raw = <span class="kw">p</span><span class="st">"{name} stays as-is"</span>
+<span class="fn">print</span>(raw)`,
+        output: ['{name} stays as-is'],
+        example: `word raw = p"{name} stays as-is"\nprint(raw)`
+      }
+    ],
+    tip: 'Interpolation only works inside regular <code>"..."</code> strings, not <code>p"..."</code> ones.'
   },
 
   if: {
     title: 'If / Elif / Else',
-    desc: 'Standard branching. One-liner form available with then.',
-    code: `<span class="kw">if</span> (x <span class="op">></span> <span class="nm">5</span>)
-    <span class="fn">print</span>(<span class="st">"big"</span>)
-<span class="kw">elif</span> (x <span class="op">==</span> <span class="nm">5</span>)
-    <span class="fn">print</span>(<span class="st">"five"</span>)
+    intro: 'Use <code>if</code> to make decisions. If the condition is true, the indented block runs. You can chain conditions with <code>elif</code> and provide a fallback with <code>else</code>.',
+    blocks: [
+      {
+        label: 'Simple if',
+        explain: 'The indented block only runs when the condition is true.',
+        code: `<span class="kw">int</span> x = <span class="nm">10</span>
+<span class="kw">if</span> x <span class="op">></span> <span class="nm">5</span>
+    <span class="fn">print</span>(<span class="st">"x is greater than 5"</span>)`,
+        output: ['x is greater than 5'],
+        example: `int x = 10\nif x > 5\n    print("x is greater than 5")`
+      },
+      {
+        label: 'if / elif / else',
+        explain: 'Chain conditions with <code>elif</code>. The <code>else</code> block runs if nothing matched.',
+        code: `<span class="kw">int</span> score = <span class="nm">72</span>
+<span class="kw">if</span> score <span class="op">>=</span> <span class="nm">90</span>
+    <span class="fn">print</span>(<span class="st">"A"</span>)
+<span class="kw">elif</span> score <span class="op">>=</span> <span class="nm">70</span>
+    <span class="fn">print</span>(<span class="st">"B"</span>)
 <span class="kw">else</span>
-    <span class="fn">print</span>(<span class="st">"small"</span>)
-
-<span class="cm"># one-liner</span>
-<span class="kw">if</span> x <span class="op">==</span> <span class="nm">10</span> <span class="kw">then</span> <span class="fn">print</span>(<span class="st">"ten"</span>)`,
-    example: `int x = 10\nif (x > 5)\n    print("big")\nelif (x == 5)\n    print("five")\nelse\n    print("small")\nif x == 10 then print("ten")`
+    <span class="fn">print</span>(<span class="st">"C"</span>)`,
+        output: ['B'],
+        example: `int score = 72\nif score >= 90\n    print("A")\nelif score >= 70\n    print("B")\nelse\n    print("C")`
+      },
+      {
+        label: 'One-liner with then',
+        explain: 'For a single statement, write it all on one line using <code>then</code>.',
+        code: `<span class="kw">int</span> x = <span class="nm">10</span>
+<span class="kw">if</span> x <span class="op">==</span> <span class="nm">10</span> <span class="kw">then</span> <span class="fn">print</span>(<span class="st">"ten!"</span>)`,
+        output: ['ten!'],
+        example: `int x = 10\nif x == 10 then print("ten!")`
+      }
+    ],
+    tip: 'Comparison operators: <code>==</code> (equal), <code>!=</code> (not equal), <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>.'
   },
 
   match: {
     title: 'Match',
-    desc: 'Pattern match on a value. Use else as the default case.',
-    code: `<span class="kw">match</span> x
-    <span class="kw">case</span> <span class="nm">10</span>
-        <span class="fn">print</span>(<span class="st">"ten"</span>)
-    <span class="kw">case</span> <span class="nm">5</span>
-        <span class="fn">print</span>(<span class="st">"five"</span>)
+    intro: '<code>match</code> is like a cleaner version of many <code>elif</code> checks. It compares one value against several possible cases and runs the first one that matches.',
+    blocks: [
+      {
+        label: 'Basic match',
+        explain: 'Write the variable after <code>match</code>, then list <code>case</code> values below it indented. Use <code>else</code> as the default.',
+        code: `<span class="kw">int</span> day = <span class="nm">1</span>
+<span class="kw">match</span> day
+    <span class="kw">case</span> <span class="nm">1</span>
+        <span class="fn">print</span>(<span class="st">"Monday"</span>)
+    <span class="kw">case</span> <span class="nm">2</span>
+        <span class="fn">print</span>(<span class="st">"Tuesday"</span>)
     <span class="kw">else</span>
-        <span class="fn">print</span>(<span class="st">"other"</span>)`,
-    example: `int x = 10\nmatch x\n    case 10\n        print("ten")\n    case 5\n        print("five")\n    else\n        print("other")`
+        <span class="fn">print</span>(<span class="st">"Other day"</span>)`,
+        output: ['Monday'],
+        example: `int day = 1\nmatch day\n    case 1\n        print("Monday")\n    case 2\n        print("Tuesday")\n    else\n        print("Other day")`
+      }
+    ],
+    tip: 'Only the first matching case runs. If nothing matches and there is no <code>else</code>, nothing happens.'
   },
 
   loops: {
     title: 'Loops',
-    desc: 'One loop keyword, many forms. Use break and continue as usual.',
-    code: `<span class="kw">loop</span> <span class="nm">3</span>                        <span class="cm"># repeat N times</span>
-    <span class="fn">print</span>(<span class="st">"tick"</span>)
-
-<span class="kw">loop</span> (n <span class="op"><</span> <span class="nm">4</span>)                  <span class="cm"># while condition</span>
+    intro: 'A loop lets you run the same block of code multiple times. GameScript uses one keyword — <code>loop</code> — for all loop types.',
+    blocks: [
+      {
+        label: 'Repeat N times',
+        explain: 'Put a number after <code>loop</code> to run the block exactly that many times.',
+        code: `<span class="kw">loop</span> <span class="nm">3</span>
+    <span class="fn">print</span>(<span class="st">"hello"</span>)`,
+        output: ['hello', 'hello', 'hello'],
+        example: `loop 3\n    print("hello")`
+      },
+      {
+        label: 'Loop while a condition is true',
+        explain: 'The loop keeps running as long as the condition stays true.',
+        code: `<span class="kw">int</span> n = <span class="nm">0</span>
+<span class="kw">loop</span> (n <span class="op">&lt;</span> <span class="nm">3</span>)
     n <span class="op">+=</span> <span class="nm">1</span>
-
-<span class="kw">loop</span> <span class="kw">int</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)        <span class="cm"># range iterator</span>
-    <span class="fn">print</span>(i)
-
-<span class="kw">loop</span> <span class="kw">word</span> fruit <span class="kw">in</span> fruits      <span class="cm"># list iterator</span>
-    <span class="fn">print</span>(fruit)
-
-<span class="kw">loop</span>                           <span class="cm"># infinite, needs break</span>
-    <span class="kw">if</span> done <span class="kw">then</span> <span class="kw">break</span>`,
-    example: `loop 3\n    print("tick")\n\nloop int i in range(5)\n    print(i)`
+<span class="fn">print</span>(n)`,
+        output: ['3'],
+        example: `int n = 0\nloop (n < 3)\n    n += 1\nprint(n)`
+      },
+      {
+        label: 'Loop over a range',
+        explain: '<code>range(5)</code> gives the numbers 0 to 4. The variable takes each value in turn.',
+        code: `<span class="kw">loop</span> <span class="kw">int</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)
+    <span class="fn">print</span>(i)`,
+        output: ['0', '1', '2', '3', '4'],
+        example: `loop int i in range(5)\n    print(i)`
+      },
+      {
+        label: 'Loop over a list',
+        explain: 'You can loop over every item in a list directly.',
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> colours = [<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>]
+<span class="kw">loop</span> <span class="kw">word</span> c <span class="kw">in</span> colours
+    <span class="fn">print</span>(c)`,
+        output: ['red', 'green', 'blue'],
+        example: `list<word> colours = ["red", "green", "blue"]\nloop word c in colours\n    print(c)`
+      },
+      {
+        label: 'break and continue',
+        explain: '<code>break</code> exits the loop immediately. <code>continue</code> skips the rest of the current iteration and moves to the next.',
+        code: `<span class="kw">loop</span> <span class="kw">int</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)
+    <span class="kw">if</span> i <span class="op">==</span> <span class="nm">2</span> <span class="kw">then</span> <span class="kw">continue</span>
+    <span class="kw">if</span> i <span class="op">==</span> <span class="nm">4</span> <span class="kw">then</span> <span class="kw">break</span>
+    <span class="fn">print</span>(i)`,
+        output: ['0', '1', '3'],
+        example: `loop int i in range(5)\n    if i == 2 then continue\n    if i == 4 then break\n    print(i)`
+      }
+    ],
+    tip: 'A bare <code>loop</code> with no condition runs forever — make sure you have a <code>break</code> inside it!'
   },
 
   lists: {
     title: 'Lists',
-    desc: 'Typed lists with built-in methods.',
-    code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
-
+    intro: 'A list holds multiple values in order. You declare the type of items it contains inside <code>&lt;&gt;</code>.',
+    blocks: [
+      {
+        label: 'Creating a list',
+        explain: 'Use <code>list&lt;type&gt;</code> to declare, then square brackets to fill it.',
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">int</span><span class="op">&gt;</span> nums = [<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>]
+<span class="fn">print</span>(nums)`,
+        output: ['[10, 20, 30]'],
+        example: `list<int> nums = [10, 20, 30]\nprint(nums)`
+      },
+      {
+        label: 'Accessing and changing items',
+        explain: 'Use <code>[index]</code> to get or set an item. Indexes start at 0.',
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">int</span><span class="op">&gt;</span> nums = [<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>]
+<span class="fn">print</span>(nums[<span class="nm">0</span>])
+nums[<span class="nm">1</span>] = <span class="nm">99</span>
+<span class="fn">print</span>(nums[<span class="nm">1</span>])`,
+        output: ['10', '99'],
+        example: `list<int> nums = [10, 20, 30]\nprint(nums[0])\nnums[1] = 99\nprint(nums[1])`
+      },
+      {
+        label: 'List methods',
+        explain: '<code>.append()</code> adds to the end, <code>.remove(index)</code> deletes by position, <code>.len()</code> returns the count.',
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
 fruits.<span class="fn">append</span>(<span class="st">"cherry"</span>)
-fruits.<span class="fn">remove</span>(<span class="nm">0</span>)
 <span class="fn">print</span>(fruits.<span class="fn">len</span>())
-<span class="fn">print</span>(fruits[<span class="nm">0</span>])
-fruits[<span class="nm">0</span>] = <span class="st">"mango"</span>
-
-<span class="kw">if</span> fruits <span class="kw">has</span> <span class="st">"mango"</span>    <span class="cm"># membership test</span>
-<span class="kw">if</span> fruits <span class="kw">not has</span> <span class="st">"kiwi"</span>`,
-    example: `list<word> fruits = ["apple", "banana", "cherry"]\nfruits.append("mango")\nprint(fruits.len())\nprint(fruits[0])\nif fruits has "mango"\n    print("has mango")`
+fruits.<span class="fn">remove</span>(<span class="nm">0</span>)
+<span class="fn">print</span>(fruits)`,
+        output: ['3', '[banana, cherry]'],
+        example: `list<word> fruits = ["apple", "banana"]\nfruits.append("cherry")\nprint(fruits.len())\nfruits.remove(0)\nprint(fruits)`
+      },
+      {
+        label: 'Checking membership: has',
+        explain: 'Use <code>has</code> to check if a value is in a list, and <code>not has</code> for the opposite.',
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
+<span class="kw">if</span> fruits <span class="kw">has</span> <span class="st">"apple"</span>
+    <span class="fn">print</span>(<span class="st">"found it"</span>)
+<span class="kw">if</span> fruits <span class="kw">not has</span> <span class="st">"mango"</span>
+    <span class="fn">print</span>(<span class="st">"no mango"</span>)`,
+        output: ['found it', 'no mango'],
+        example: `list<word> fruits = ["apple", "banana"]\nif fruits has "apple"\n    print("found it")\nif fruits not has "mango"\n    print("no mango")`
+      }
+    ],
+    tip: 'Lists are zero-indexed — the first item is at index <code>0</code>, not <code>1</code>.'
   },
 
   dicts: {
     title: 'Dicts',
-    desc: 'Key-value maps with typed keys and values.',
-    code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> scores = {<span class="st">"alice"</span> = <span class="nm">10</span>, <span class="st">"bob"</span> = <span class="nm">20</span>}
-
-<span class="fn">print</span>(scores[<span class="st">"alice"</span>])
-scores[<span class="st">"charlie"</span>] = <span class="nm">30</span>
-
-<span class="kw">if</span> scores.<span class="fn">has</span>(<span class="st">"bob"</span>) <span class="kw">then</span> <span class="fn">print</span>(<span class="st">"bob exists"</span>)`,
-    example: `dict<word, int> scores = {"alice" = 10, "bob" = 20}\nprint(scores["alice"])\nscores["charlie"] = 30\nprint(scores["charlie"])\nif scores.has("bob") then print("bob exists")`
+    intro: 'A dict (dictionary) stores key-value pairs — like a real dictionary where you look up a word to get its meaning. You declare both the key type and the value type.',
+    blocks: [
+      {
+        label: 'Creating a dict',
+        explain: 'Use <code>dict&lt;keyType, valueType&gt;</code> and set pairs with <code>"key" = value</code> inside <code>{}</code>.',
+        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"alice"</span> = <span class="nm">25</span>, <span class="st">"bob"</span> = <span class="nm">30</span>}
+<span class="fn">print</span>(ages[<span class="st">"alice"</span>])`,
+        output: ['25'],
+        example: `dict<word, int> ages = {"alice" = 25, "bob" = 30}\nprint(ages["alice"])`
+      },
+      {
+        label: 'Adding and updating',
+        explain: 'Assign to a new key to add it, or an existing key to update it.',
+        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"alice"</span> = <span class="nm">25</span>}
+ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
+<span class="fn">print</span>(ages[<span class="st">"charlie"</span>])`,
+        output: ['22'],
+        example: `dict<word, int> ages = {"alice" = 25}\nages["charlie"] = 22\nprint(ages["charlie"])`
+      },
+      {
+        label: 'Checking if a key exists',
+        explain: 'Use <code>.has(key)</code> before accessing a key you are not sure about.',
+        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"bob"</span> = <span class="nm">30</span>}
+<span class="kw">if</span> ages.<span class="fn">has</span>(<span class="st">"bob"</span>) <span class="kw">then</span> <span class="fn">print</span>(<span class="st">"bob is here"</span>)`,
+        output: ['bob is here'],
+        example: `dict<word, int> ages = {"bob" = 30}\nif ages.has("bob") then print("bob is here")`
+      }
+    ],
+    tip: 'Always use <code>.has()</code> before accessing a key you are not sure about — missing keys cause errors.'
   },
 
   functions: {
     title: 'Functions',
-    desc: 'Declare with fn, specify return type and parameter types. Use global for shared state.',
-    code: `<span class="kw">fn</span> <span class="ty">int</span> <span class="fn">add</span>(<span class="ty">int</span> a, <span class="ty">int</span> b)
+    intro: 'A function is a reusable block of code. Define it once with <code>fn</code> and call it by name whenever needed.',
+    blocks: [
+      {
+        label: 'Defining and calling a function',
+        explain: 'Write <code>fn returnType name(params)</code>. Use <code>return</code> to send a value back.',
+        code: `<span class="kw">fn</span> <span class="ty">int</span> <span class="fn">add</span>(<span class="ty">int</span> a, <span class="ty">int</span> b)
     <span class="kw">return</span> a <span class="op">+</span> b
 
-<span class="kw">fn</span> <span class="ty">word</span> <span class="fn">greet</span>(<span class="ty">word</span> who)
-    <span class="kw">return</span> <span class="st">"Hi, {who}!"</span>
+<span class="fn">print</span>(<span class="fn">add</span>(<span class="nm">3</span>, <span class="nm">7</span>))`,
+        output: ['10'],
+        example: `fn int add(int a, int b)\n    return a + b\n\nprint(add(3, 7))`
+      },
+      {
+        label: 'void — no return value',
+        explain: 'Use <code>void</code> when the function just does something without returning a value.',
+        code: `<span class="kw">fn</span> <span class="ty">void</span> <span class="fn">greet</span>(<span class="ty">word</span> name)
+    <span class="fn">print</span>(<span class="st">"Hello, {name}!"</span>)
 
-<span class="fn">print</span>(<span class="fn">add</span>(<span class="nm">3</span>, <span class="nm">7</span>))
-<span class="fn">print</span>(<span class="fn">greet</span>(<span class="st">"world"</span>))
+<span class="fn">greet</span>(<span class="st">"world"</span>)`,
+        output: ['Hello, world!'],
+        example: `fn void greet(word name)\n    print("Hello, {name}!")\n\ngreet("world")`
+      },
+      {
+        label: 'const and global',
+        explain: '<code>const</code> is a value that can never change. <code>global</code> declares a variable that all functions can read and modify.',
+        code: `<span class="kw">global</span> <span class="ty">int</span> score = <span class="nm">0</span>
 
-<span class="kw">const</span> <span class="ty">int</span> MAX = <span class="nm">100</span>       <span class="cm"># immutable</span>
-<span class="kw">global</span> <span class="ty">int</span> score = <span class="nm">0</span>     <span class="cm"># accessible everywhere</span>`,
-    example: `fn int add(int a, int b)\n    return a + b\n\nfn word greet(word who)\n    return "Hi, {who}!"\n\nprint(add(3, 7))\nprint(greet("world"))`
+<span class="kw">fn</span> <span class="ty">void</span> <span class="fn">addPoint</span>()
+    score <span class="op">+=</span> <span class="nm">1</span>
+
+<span class="fn">addPoint</span>()
+<span class="fn">print</span>(score)`,
+        output: ['1'],
+        example: `global int score = 0\n\nfn void addPoint()\n    score += 1\n\naddPoint()\nprint(score)`
+      }
+    ],
+    tip: 'Functions must be defined before they are called — put them near the top of your code.'
   },
 
   trycatch: {
     title: 'Try / Catch',
-    desc: 'Handle runtime errors gracefully.',
-    code: `<span class="kw">try</span>
+    intro: 'Sometimes code can fail at runtime — for example, converting text that isn\'t a number. Use <code>try</code> / <code>catch</code> to handle errors gracefully instead of crashing.',
+    blocks: [
+      {
+        label: 'Basic try / catch',
+        explain: 'Put the risky code inside <code>try</code>. If something goes wrong, execution jumps to <code>catch</code> — the error message is stored in the variable you name.',
+        code: `<span class="kw">try</span>
     <span class="kw">int</span> n = <span class="fn">toInt</span>(<span class="st">"oops"</span>)
+    <span class="fn">print</span>(n)
 <span class="kw">catch</span> (<span class="ty">word</span> err)
-    <span class="fn">print</span>(<span class="st">"caught: {err}"</span>)`,
-    example: `try\n    int n = toInt("oops")\n    print(n)\ncatch (word err)\n    print("caught: {err}")`
+    <span class="fn">print</span>(<span class="st">"Error: {err}"</span>)`,
+        output: ['Error: cannot convert "oops" to int'],
+        example: `try\n    int n = toInt("oops")\n    print(n)\ncatch (word err)\n    print("Error: {err}")`
+      },
+      {
+        label: 'Type conversion built-ins',
+        explain: '<code>toInt()</code>, <code>toDec()</code>, and <code>toStr()</code> convert values between types. They throw an error if given something invalid.',
+        code: `<span class="fn">print</span>(<span class="fn">toInt</span>(<span class="st">"42"</span>))
+<span class="fn">print</span>(<span class="fn">toDec</span>(<span class="st">"3.14"</span>))
+<span class="fn">print</span>(<span class="fn">toStr</span>(<span class="nm">100</span>))`,
+        output: ['42', '3.14', '100'],
+        example: `print(toInt("42"))\nprint(toDec("3.14"))\nprint(toStr(100))`
+      }
+    ],
+    tip: 'Wrap anything that converts user input in a <code>try</code> block — users often type unexpected things.'
+  },
+
+  input: {
+    title: 'Input — take()',
+    intro: '<code>take()</code> pauses the program and waits for the user to type something, right in the output panel. When you assign it to a typed variable, GameScript automatically converts the text to that type.',
+    blocks: [
+      {
+        label: 'Reading text',
+        explain: 'Assign <code>take()</code> to a <code>word</code> variable. Whatever the user types is stored as-is.',
+        code: `<span class="kw">word</span> name = <span class="fn">take</span>(<span class="st">"Your name: "</span>)
+<span class="fn">print</span>(<span class="st">"Hello, {name}!"</span>)`,
+        output: ['Your name: &nbsp;<em style="color:#888">(type and press Enter)</em>', 'Hello, ...!'],
+        example: `word name = take("Your name: ")\nprint("Hello, {name}!")`
+      },
+      {
+        label: 'Reading a number',
+        explain: 'Assign to <code>int</code> or <code>dec</code> — GameScript converts the input automatically.',
+        code: `<span class="kw">int</span> age = <span class="fn">take</span>(<span class="st">"Your age: "</span>)
+<span class="fn">print</span>(<span class="st">"You are {age} years old."</span>)`,
+        output: ['Your age: &nbsp;<em style="color:#888">(type a number)</em>', 'You are ... years old.'],
+        example: `int age = take("Your age: ")\nprint("You are {age} years old.")`
+      },
+      {
+        label: 'Reading a bool',
+        explain: 'Assign to <code>bool</code>. The user must type exactly <code>true</code> or <code>false</code>.',
+        code: `<span class="kw">bool</span> ready = <span class="fn">take</span>(<span class="st">"Ready? (true/false): "</span>)
+<span class="kw">if</span> ready <span class="kw">then</span> <span class="fn">print</span>(<span class="st">"Let's go!"</span>)`,
+        output: ['Ready? (true/false): &nbsp;<em style="color:#888">(type true or false)</em>', "Let's go!"],
+        example: `bool ready = take("Ready? (true/false): ")\nif ready then print("Let's go!")`
+      },
+      {
+        label: 'Safe input with try / catch',
+        explain: 'If the user types something invalid, wrap it in <code>try</code> to catch the error nicely.',
+        code: `<span class="kw">try</span>
+    <span class="kw">int</span> n = <span class="fn">take</span>(<span class="st">"Enter a number: "</span>)
+    <span class="fn">print</span>(<span class="st">"You entered {n}"</span>)
+<span class="kw">catch</span> (<span class="ty">word</span> err)
+    <span class="fn">print</span>(<span class="st">"That wasn't a number!"</span>)`,
+        output: ['Enter a number: &nbsp;<em style="color:#888">(type something)</em>', '...'],
+        example: `try\n    int n = take("Enter a number: ")\n    print("You entered {n}")\ncatch (word err)\n    print("That wasn't a number!")`
+      }
+    ],
+    tip: '<code>take()</code> pauses execution inline — you type right in the output panel and press <strong>Enter</strong> to continue.'
   },
 
   misc: {
     title: 'Misc',
-    desc: 'Ternary, null coalescing, del, and augmented assignment.',
-    code: `<span class="cm"># ternary</span>
-<span class="kw">word</span> verdict = x <span class="op">></span> <span class="nm">0</span> <span class="op">?</span> <span class="st">"positive"</span> <span class="op">:</span> <span class="st">"negative"</span>
-
-<span class="cm"># null coalescing</span>
-<span class="kw">word</span> result = maybe <span class="op">??</span> <span class="st">"default"</span>
-
-<span class="cm"># augmented assign</span>
-val <span class="op">+=</span> <span class="nm">5</span>
-val <span class="op">-=</span> <span class="nm">3</span>
-val <span class="op">*=</span> <span class="nm">2</span>
-val <span class="op">/=</span> <span class="nm">4</span>
-val <span class="op">%=</span> <span class="nm">5</span>
-
-<span class="cm"># delete a variable</span>
+    intro: 'A few extra features that are very useful but do not fit neatly into other categories.',
+    blocks: [
+      {
+        label: 'Ternary operator ?:',
+        explain: 'A one-line if/else that produces a value. Format: <code>condition ? valueIfTrue : valueIfFalse</code>.',
+        code: `<span class="kw">int</span> x = <span class="nm">10</span>
+<span class="kw">word</span> result = x <span class="op">></span> <span class="nm">0</span> <span class="op">?</span> <span class="st">"positive"</span> <span class="op">:</span> <span class="st">"negative"</span>
+<span class="fn">print</span>(result)`,
+        output: ['positive'],
+        example: `int x = 10\nword result = x > 0 ? "positive" : "negative"\nprint(result)`
+      },
+      {
+        label: 'Null coalescing ??',
+        explain: '<code>??</code> returns the left side if it is not <code>null</code>, otherwise the right side. Great for default values.',
+        code: `<span class="kw">word</span> input = <span class="kw">null</span>
+<span class="kw">word</span> name = input <span class="op">??</span> <span class="st">"Guest"</span>
+<span class="fn">print</span>(name)`,
+        output: ['Guest'],
+        example: `word input = null\nword name = input ?? "Guest"\nprint(name)`
+      },
+      {
+        label: 'Augmented assignment',
+        explain: 'Shorthand for updating a variable. <code>x += 5</code> means <code>x = x + 5</code>.',
+        code: `<span class="kw">int</span> x = <span class="nm">10</span>
+x <span class="op">+=</span> <span class="nm">5</span>
+x <span class="op">-=</span> <span class="nm">2</span>
+x <span class="op">*=</span> <span class="nm">3</span>
+<span class="fn">print</span>(x)`,
+        output: ['39'],
+        example: `int x = 10\nx += 5\nx -= 2\nx *= 3\nprint(x)`
+      },
+      {
+        label: 'del — delete a variable',
+        explain: '<code>del</code> removes a variable from memory entirely.',
+        code: `<span class="kw">int</span> temp = <span class="nm">42</span>
+<span class="fn">print</span>(temp)
 <span class="kw">del</span> temp`,
-    example: `int x = 10\nword verdict = x > 0 ? "positive" : "negative"\nprint(verdict)\n\nword maybe = null\nword result = maybe ?? "default"\nprint(result)\n\nint val = 10\nval += 5\nval -= 3\nprint(val)`
+        output: ['42'],
+        example: `int temp = 42\nprint(temp)\ndel temp`
+      }
+    ],
+    tip: 'Ternary and <code>??</code> are great for keeping code short when you just need a quick choice or a default value.'
   }
 };
 
+function makeOutputBox(lines){
+  if(!lines || lines.length === 0) return '';
+  const rows = lines.map(l => `<div class="out-line">${l}</div>`).join('');
+  return `<div class="output-box"><div class="out-label">Output</div>${rows}</div>`;
+}
+
 function render(key){
   const s = sections[key];
-  const encoded = encodeURIComponent(s.example);
-  document.getElementById('syntax-content').innerHTML = `
-    <h4>${s.title}</h4>
-    <p>${s.desc}</p>
-    <div class="code-block">${s.code}</div>
-    <a class="try-btn" href="play.html?code=${encoded}">▶ Try in Playground →</a>
-  `;
+  let html = `<h4>${s.title}</h4>`;
+  html += `<div class="intro-box">${s.intro}</div>`;
+
+  s.blocks.forEach((b, idx) => {
+    if(idx > 0) html += '<hr class="content-divider">';
+    html += `<div class="section-label">${b.label}</div>`;
+    html += `<p>${b.explain}</p>`;
+    html += `<div class="code-block">${b.code}</div>`;
+    html += makeOutputBox(b.output);
+    const encoded = encodeURIComponent(b.example.replace(/\\n/g, '\n'));
+    html += `<a class="try-btn" href="play.html?code=${encoded}">&#9654; Try it &#8594;</a>`;
+  });
+
+  if(s.tip){
+    html += `<div class="tip-box"><strong>&#128161; Tip:</strong> ${s.tip}</div>`;
+  }
+
+  document.getElementById('syntax-content').innerHTML = html;
 }
 
 document.querySelectorAll('.syntax-nav-item').forEach(btn => {
@@ -370,11 +727,13 @@ document.querySelectorAll('.syntax-nav-item').forEach(btn => {
   });
 });
 
-// load from URL param if present
 const params = new URLSearchParams(location.search);
 const initial = params.get('section') || 'variables';
 const initialBtn = document.querySelector(`[data-section="${initial}"]`);
-if(initialBtn){ initialBtn.classList.add('active'); document.querySelectorAll('.syntax-nav-item').forEach(b=>{ if(b!==initialBtn) b.classList.remove('active'); }); }
+if(initialBtn){
+  document.querySelectorAll('.syntax-nav-item').forEach(b => b.classList.remove('active'));
+  initialBtn.classList.add('active');
+}
 render(initial);
 </script>
 
