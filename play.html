@@ -7,23 +7,96 @@
   <link rel="icon" type="image/svg" href="assets/images/logo.svg">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="main.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/trianglify@4/dist/trianglify.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <style>
+    .cm-s-dracula .cm-keyword   { color: #c792ea !important; }
+    .cm-s-dracula .cm-type      { color: #82aaff !important; }
+    .cm-s-dracula .cm-string    { color: #c3e88d !important; }
+    .cm-s-dracula .cm-number    { color: #f78c6c !important; }
+    .cm-s-dracula .cm-comment   { color: #546e7a !important; font-style: italic; }
+    .cm-s-dracula .cm-builtin   { color: #82aaff !important; }
+    .cm-s-dracula .cm-operator  { color: #89ddff !important; }
+    .cm-s-dracula .cm-atom      { color: #c792ea !important; }
+    .playground-container {
+      display: flex;
+      gap: 1.5rem;
+      margin: 2rem auto;
+      max-width: 1500px;
+      min-height: 600px;
+    }
+    .editor-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .output-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .editor-header, .output-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.5rem; padding: 0 0.25rem;
+    }
+    .editor-header h3, .output-header h3 { color: #154f55; font-weight: 700; font-size: 1.1rem; }
+    .CodeMirror { height: 500px; border-radius: 12px; font-family: 'Fira Code', monospace; font-size: 14px; }
+    .output-content {
+      background: #1e1e1e; border-radius: 12px; padding: 1.5rem;
+      height: 500px; overflow-y: auto; color: #fff;
+      font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.6;
+    }
+    .output-line  { margin: 0.25rem 0; color: #d4d4d4; white-space: pre-wrap; }
+    .output-error { color: #f06a4d; }
+    .output-prompt{ color: #888; }
+    .toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .example-selector {
+      background: white; border-radius: 999px; padding: 0.25rem;
+      display: inline-flex; flex-wrap: wrap;
+    }
+    .example-btn {
+      padding: 0.5rem 1.25rem; border-radius: 999px; font-size: 0.9rem;
+      font-weight: 600; transition: all 0.2s ease; border: none; cursor: pointer; background: transparent;
+    }
+    .example-btn:hover { background: rgba(240,106,77,0.1); }
+    .example-btn.active { background: #f06a4d; color: white; }
+    .status-badge {
+      background: rgba(63,175,164,0.2); color: #3fafa4;
+      padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+    }
+    @media (max-width: 768px) {
+  .playground-container,
+  .syntax-layout {
+    flex-direction: column;
+  }
+
+  .syntax-nav {
+    width: 100%;
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+
+  .syntax-nav-item {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .CodeMirror,
+  .output-content {
+    height: 300px;
+  }
+}
+  </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-<!-- Navbar -->
 <header class="navbar-bar">
   <div class="navbar-content container mx-auto flex items-center justify-between p-4 flex-wrap">
     <a href="index.html" class="flex items-center space-x-2">
       <img src="assets/images/logo.png" alt="Logo" class="h-12 w-12 md:h-20 md:w-20 object-contain">
     </a>
-    <button id="menu-btn" class="md:hidden focus:outline-none">
-    </button>
+    <button id="menu-btn" class="md:hidden focus:outline-none"></button>
     <nav class="navbar-links hidden md:flex flex-wrap justify-evenly text-base md:text-xl font-semibold w-full md:w-auto mt-4 md:mt-0 space-y-2 md:space-y-0 md:space-x-4">
       <a href="index.html" class="navbar-toplink">Home</a>
       <a href="install.html" class="navbar-toplink">Install</a>
-      <a href="play.html" class="navbar-toplink active">Play</a>
+      <a href="play.html" class="navbar-toplink active">Playground</a>
       <a href="syntax.html" class="navbar-toplink">Syntax</a>
       <a href="blog.html" class="navbar-toplink">Blog</a>
     </nav>
@@ -31,29 +104,75 @@
 </header>
 
 <main class="w-full px-4 md:px-8">
-  <!-- PATTERN 2: Full width card (NO images) -->
-  <!-- |-------------------------| -->
+
   <div class="card-full">
     <div class="card-content">
-      <h5>Currently in development</h5>
-      <p>The language is currently under development. <br>The home page will inform you when the playground is finally available <br> Please be patient by the time.</p>
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h5 class="!mt-0 !mb-2">GameScript Playground - v0.3.0</h5>
+          <p class="text-gray-600">This is a simulated compiler showing how GameScript will work. The actual language is in development.</p>
+          <p class="text-gray-600">Wrong syntaxes give out (no output)</p>
+          <p class="text-gray-600">This isn't the final language and may easily give errors, please stand by while the actual language is in progress</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="playground-container">
+    <div class="editor-panel">
+      <div class="editor-header">
+        <h3>test.gs</h3>
+        <div class="toolbar">
+          <button class="button !py-1 !px-3 !text-sm" id="run-btn">▶ Run</button>
+          <button class="button !py-1 !px-3 !text-sm !bg-[#3fafa4]" id="clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="example-selector mb-4">
+        <button class="example-btn active" data-example="basics">Basics</button>
+        <button class="example-btn" data-example="loops">Loops</button>
+        <button class="example-btn" data-example="lists">Lists</button>
+        <button class="example-btn" data-example="functions">Functions</button>
+      </div>
+      <textarea id="code-editor"></textarea>
+    </div>
+
+    <div class="output-panel">
+      <div class="output-header">
+        <h3>Output (Simulated)</h3>
+      </div>
+      <div class="output-content" id="output">
+        <div class="output-prompt">GameScript Playground v0.3.0</div>
+        <div class="output-prompt">Click Run to execute code →</div>
       </div>
     </div>
   </div>
 
   <div class="card-full">
     <div class="card-content">
-      <h5>Check out the development</h5>
-      <p>Check out how the language is being developed in my blog.</p>
-      <a href="blog.html" class="button">Blog &rarr;</a>
+      <h5>Supported Features (Stage 3)</h5>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        <div class="text-left">
+          <h6 class="text-[#1f6f78] mb-2">Variables</h6>
+          <p class="text-sm">int, dec, word, bool, list, dict</p>
+        </div>
+        <div class="text-left">
+          <h6 class="text-[#1f6f78] mb-2">Operators</h6>
+          <p class="text-sm">+, -, *, /, %, **, ??, ?:</p>
+        </div>
+        <div class="text-left">
+          <h6 class="text-[#1f6f78] mb-2">Control Flow</h6>
+          <p class="text-sm">if/elif/else, match, loop, break/continue</p>
+        </div>
+        <div class="text-left">
+          <h6 class="text-[#1f6f78] mb-2">Functions</h6>
+          <p class="text-sm">fn, return, try/catch, global/const</p>
+        </div>
       </div>
     </div>
   </div>
-
 
 </main>
 
-<!-- Bottom Bar -->
 <footer class="bot-bar mt-10">
   <div class="max-w-7xl mx-auto px-6 flex flex-col items-center text-center space-y-4">
     <img src="assets/images/logo.png" alt="logo" class="pt-6 h-24 w-24 md:h-40 md:w-40 object-contain rounded-full">
@@ -63,5 +182,1128 @@
   </div>
 </footer>
 
+<script>
+// ─────────────────────────────────────────────
+//  GameScript Interpreter  (Stage 3 simulation)
+// ─────────────────────────────────────────────
+
+class GSError extends Error { constructor(msg){ super(msg); } }
+class BreakSignal  {}
+class ContinueSignal {}
+class ReturnSignal { constructor(v){ this.value = v; } }
+
+class GSList {
+  constructor(items=[]){ this.items = [...items]; }
+  len(){ return this.items.length; }
+  append(v){ this.items.push(v); }
+  remove(i){ this.items.splice(i,1); }
+  has(v){ return this.items.includes(v); }
+  get(i){ return this.items[i]; }
+  set(i,v){ this.items[i]=v; }
+  toString(){ return '[' + this.items.map(gsStr).join(', ') + ']'; }
+}
+
+class GSDict {
+  constructor(){ this.map = new Map(); }
+  get(k){ return this.map.get(k); }
+  set(k,v){ this.map.set(k,v); }
+  has(k){ return this.map.has(k); }
+  toString(){ 
+    const pairs = [...this.map.entries()].map(([k,v])=>`"${k}" = ${gsStr(v)}`);
+    return '{' + pairs.join(', ') + '}';
+  }
+}
+
+class GSInstance {
+  constructor(classDef, args, env){
+    this.classDef = classDef;
+    this.fields = new Map();
+    this.methods = new Map(classDef.methods);
+    // init fields with default values from class body
+    for(const [k,v] of classDef.fields) this.fields.set(k, v);
+    // bind constructor args to param names
+    classDef.params.forEach((p,i)=>{
+      this.fields.set(p.name, args[i] !== undefined ? args[i] : null);
+    });
+  }
+  get(k){ return this.fields.has(k) ? this.fields.get(k) : this.methods.get(k); }
+  set(k,v){ this.fields.set(k,v); }
+  toString(){ return `<${this.classDef.name} instance>`; }
+}
+
+function gsStr(v){
+  if(v === null || v === undefined) return 'null';
+  if(v === true) return 'true';
+  if(v === false) return 'false';
+  if(v instanceof GSList) return v.toString();
+  if(v instanceof GSDict) return v.toString();
+  if(v instanceof GSInstance) return v.toString();
+  return String(v);
+}
+
+// ── Tokeniser / parser helpers ──────────────────
+
+function parseLines(code){
+  // Returns array of {indent, text, lineNo}
+  return code.split('\n').map((raw, i)=>{
+    const indent = raw.match(/^(\s*)/)[1].length;
+    return { indent, text: raw.trim(), lineNo: i };
+  });
+}
+
+function collectBlock(lines, start, baseIndent){
+  // Collect all lines that belong to this block (indent > baseIndent)
+  const block = [];
+  let i = start;
+  while(i < lines.length){
+    const l = lines[i];
+    if(l.text === '' || l.text.startsWith('#')){ i++; continue; }
+    if(l.indent <= baseIndent) break;
+    block.push(l);
+    i++;
+  }
+  return { block, next: i };
+}
+
+// ── Interpreter class ────────────────────────────
+
+class GameScriptInterpreter {
+  constructor(){
+    this.output = [];
+    this.globalEnv = null;
+  }
+
+  run(code){
+    this.output = [];
+    const lines = parseLines(code);
+    const env = new Env(null);
+    this.globalEnv = env;
+    // built-ins
+    env.set('true', true);
+    env.set('false', false);
+    env.set('null', null);
+    try {
+      this.execBlock(lines, 0, -1, env);
+    } catch(e){
+      if(e instanceof GSError) this.emit('Error: ' + e.message);
+      else if(e instanceof BreakSignal) this.emit('Error: break outside loop');
+      else if(e instanceof ContinueSignal) this.emit('Error: continue outside loop');
+      else if(e instanceof ReturnSignal) { /* top-level return, ignore */ }
+      else this.emit('Runtime error: ' + e.message);
+    }
+    return this.output;
+  }
+
+  emit(line, isError=false){
+    this.output.push({ text: String(line), isError });
+  }
+
+  // Execute a slice of lines as a block. baseIndent = indent level of the *header* line.
+  // Returns the index of the next unprocessed line.
+  execBlock(lines, start, baseIndent, env){
+    let i = start;
+    while(i < lines.length){
+      const l = lines[i];
+      if(l.text === '' || l.text.startsWith('#')){ i++; continue; }
+      if(baseIndent >= 0 && l.indent <= baseIndent) break;
+      i = this.execLine(lines, i, env);
+    }
+    return i;
+  }
+
+  execLine(lines, i, env){
+    const l = lines[i];
+    const line = l.text;
+    if(!line || line.startsWith('#')) return i+1;
+
+    // ── one-liner: `if COND then STMT`
+    const oneLiner = line.match(/^if\s+(.+?)\s+then\s+(.+)$/);
+    if(oneLiner){
+      const cond = this.evalExpr(oneLiner[1].trim(), env);
+      if(this.isTruthy(cond)) this.execLine([{indent: l.indent, text: oneLiner[2].trim(), lineNo: l.lineNo}], 0, env);
+      return i+1;
+    }
+
+    // ── if / elif / else
+    if(line.startsWith('if ')){
+      return this.execIf(lines, i, env);
+    }
+
+    // ── match
+    if(line.startsWith('match ')){
+      return this.execMatch(lines, i, env);
+    }
+
+    // ── loop
+    if(line === 'loop' || line.startsWith('loop ')){
+      return this.execLoop(lines, i, env);
+    }
+
+    // ── fn definition
+    if(line.startsWith('fn ')){
+      return this.execFnDef(lines, i, env);
+    }
+
+    // ── class definition
+    if(line.startsWith('class ')){
+      return this.execClassDef(lines, i, env);
+    }
+
+    // ── try / catch
+    if(line === 'try'){
+      return this.execTryCatch(lines, i, env);
+    }
+
+    // ── return
+    if(line.startsWith('return')){
+      const val = line.length > 6 ? this.evalExpr(line.slice(6).trim(), env) : null;
+      throw new ReturnSignal(val);
+    }
+
+    // ── break / continue
+    if(line === 'break') throw new BreakSignal();
+    if(line === 'continue') throw new ContinueSignal();
+
+    // ── del
+    if(line.startsWith('del ')){
+      const name = line.slice(4).trim();
+      env.del(name);
+      return i+1;
+    }
+
+    // ── print
+    if(line.startsWith('print(')){
+      const inner = this.extractCallArg(line, 'print');
+      const val = this.evalExpr(inner, env);
+      this.emit(gsStr(val));
+      return i+1;
+    }
+
+    // ── const declaration
+    if(line.startsWith('const ')){
+      const m = line.match(/^const\s+\w+\s+(\w+)\s*=\s*(.+)$/);
+      if(m){ env.set(m[1], this.evalExpr(m[2].trim(), env)); }
+      return i+1;
+    }
+
+    // ── global declaration
+    if(line.startsWith('global ')){
+      const m = line.match(/^global\s+\w+\s+(\w+)\s*=\s*(.+)$/);
+      if(m){ this.globalEnv.set(m[1], this.evalExpr(m[2].trim(), env)); }
+      return i+1;
+    }
+
+    // ── typed variable declaration: int x = ...  /  list<T> x = ...  / dict<K,V> x = ...
+    const typedDecl = line.match(/^(?:list<[^>]+>|dict<[^>]+>|int|dec|word|bool)\s+(?!this\.)(\w+)\s*=\s*(.+)$/);
+    if(typedDecl){
+      env.set(typedDecl[1], this.evalExpr(typedDecl[2].trim(), env));
+      return i+1;
+    }
+    const classDecl = line.match(/^[A-Z]\w*\s+(\w+)\s*=\s*(.+)$/);
+      if(classDecl){
+        env.set(classDecl[1], this.evalExpr(classDecl[2].trim(), env));
+        return i+1;
+      }
+
+    // ── assignment / augmented assign / subscript assign
+    // obj.field = val
+    const dotAssign = line.match(/^(\w+)\.(\w+)\s*=\s*(.+)$/);
+    if(dotAssign){
+      const obj = env.get(dotAssign[1]);
+      if(obj instanceof GSInstance) obj.set(dotAssign[2], this.evalExpr(dotAssign[3].trim(), env));
+      return i+1;
+    }
+
+    // arr[i] = val
+    const subAssign = line.match(/^(\w+)\[(.+)\]\s*=\s*(.+)$/);
+    if(subAssign){
+      const container = env.get(subAssign[1]);
+      const key = this.evalExpr(subAssign[2].trim(), env);
+      const val = this.evalExpr(subAssign[3].trim(), env);
+      if(container instanceof GSList) container.set(key, val);
+      else if(container instanceof GSDict) container.set(key, val);
+      return i+1;
+    }
+
+    // augmented assign: x += ...
+    const augAssign = line.match(/^(\w+)\s*(\+=|-=|\*=|\/=|%=)\s*(.+)$/);
+    if(augAssign){
+      const cur = env.get(augAssign[1]);
+      const rhs = this.evalExpr(augAssign[3].trim(), env);
+      let res;
+      switch(augAssign[2]){
+        case '+=': res = cur + rhs; break;
+        case '-=': res = cur - rhs; break;
+        case '*=': res = cur * rhs; break;
+        case '/=': res = cur / rhs; break;
+        case '%=': res = cur % rhs; break;
+      }
+      env.update(augAssign[1], res);
+      return i+1;
+    }
+
+    // plain assign: x = expr
+    const plainAssign = line.match(/^(\w+)\s*=\s*(.+)$/);
+    if(plainAssign){
+      env.update(plainAssign[1], this.evalExpr(plainAssign[2].trim(), env));
+      return i+1;
+    }
+
+    // ── standalone expression / method call (e.g. dog.bark())
+    try {
+      this.evalExpr(line, env);
+    } catch(e) {
+      if(e instanceof BreakSignal || e instanceof ContinueSignal || e instanceof ReturnSignal) throw e;
+      // ignore eval errors on standalone lines
+    }
+    return i+1;
+  }
+
+  // ── if / elif / else ─────────────────────────────
+  execIf(lines, i, env){
+    const baseIndent = lines[i].indent;
+
+    // Gather all branches: [{cond, blockLines}] and optional else
+    const branches = [];
+    let elseBranch = null;
+    let cur = i;
+
+    while(cur < lines.length){
+      const l = lines[cur];
+      if(l.text === '' || l.text.startsWith('#')){ cur++; continue; }
+      if(l.indent < baseIndent) break;
+      if(l.indent > baseIndent) break; // should not happen here
+      
+      if(l.text.startsWith('if ') || l.text.startsWith('elif ')){
+        const condStr = l.text.replace(/^(?:if|elif)\s+/, '').replace(/^\((.+)\)$/, '$1');
+        const { block, next } = collectBlock(lines, cur+1, baseIndent);
+        branches.push({ cond: condStr, block });
+        cur = next;
+      } else if(l.text === 'else'){
+        const { block, next } = collectBlock(lines, cur+1, baseIndent);
+        elseBranch = block;
+        cur = next;
+        break;
+      } else {
+        break;
+      }
+    }
+
+    // Execute first matching branch
+    let executed = false;
+    for(const branch of branches){
+      // strip optional outer parens
+      const condStr = branch.cond.replace(/^\((.+)\)$/, '$1');
+      if(this.isTruthy(this.evalExpr(condStr, env))){
+        this.execBlock(branch.block, 0, -1, new Env(env));
+        executed = true;
+        break;
+      }
+    }
+    if(!executed && elseBranch){
+      this.execBlock(elseBranch, 0, -1, new Env(env));
+    }
+
+    return cur;
+  }
+
+  // ── match ────────────────────────────────────────
+  execMatch(lines, i, env){
+    const baseIndent = lines[i].indent;
+    const subject = this.evalExpr(lines[i].text.slice(6).trim(), env);
+    let cur = i+1;
+    let matched = false;
+
+    while(cur < lines.length){
+      const l = lines[cur];
+      if(l.text === '' || l.text.startsWith('#')){ cur++; continue; }
+      if(l.indent <= baseIndent){ break; }
+      // case / else at one indent deeper
+      if(l.text.startsWith('case ')){
+        const caseVal = this.evalExpr(l.text.slice(5).trim(), env);
+        const { block, next } = collectBlock(lines, cur+1, l.indent);
+        if(!matched && this.valuesEqual(subject, caseVal)){
+          this.execBlock(block, 0, -1, new Env(env));
+          matched = true;
+        }
+        cur = next;
+      } else if(l.text === 'else'){
+        const { block, next } = collectBlock(lines, cur+1, l.indent);
+        if(!matched){
+          this.execBlock(block, 0, -1, new Env(env));
+        }
+        cur = next;
+        break;
+      } else {
+        break;
+      }
+    }
+    return cur;
+  }
+
+  // ── loop ─────────────────────────────────────────
+  execLoop(lines, i, env){
+    const l = lines[i];
+    const baseIndent = l.indent;
+    const header = l.text; // e.g. "loop", "loop 3", "loop (n < 4)", "loop int i in range(5)", "loop word fruit in fruits"
+    const { block, next } = collectBlock(lines, i+1, baseIndent);
+
+    const runBody = (loopEnv) => {
+      try {
+        this.execBlock([...block], 0, -1, loopEnv);
+      } catch(s){
+        if(s instanceof BreakSignal) return false;   // stop
+        if(s instanceof ContinueSignal) return true; // next iteration
+        throw s;
+      }
+      return true; // keep going
+    };
+
+    // loop int i in range(N) / loop int i in range(start, end)
+    const iterRange = header.match(/^loop\s+\w+\s+(\w+)\s+in\s+range\((.+)\)$/);
+    if(iterRange){
+      const varName = iterRange[1];
+      const args = iterRange[2].split(',').map(a => Number(this.evalExpr(a.trim(), env)));
+      const [from, to] = args.length === 1 ? [0, args[0]] : [args[0], args[1]];
+      for(let v=from; v<to; v++){
+        const le = new Env(env);
+        le.set(varName, v);
+        if(!runBody(le)) break;
+      }
+      return next;
+    }
+
+    // loop word fruit in fruits  /  loop TYPE varName in listExpr
+    const iterList = header.match(/^loop\s+\w+\s+(\w+)\s+in\s+(.+)$/);
+    if(iterList){
+      const varName = iterList[1];
+      const listVal = this.evalExpr(iterList[2].trim(), env);
+      const items = listVal instanceof GSList ? listVal.items : (Array.isArray(listVal) ? listVal : []);
+      for(const item of items){
+        const le = new Env(env);
+        le.set(varName, item);
+        if(!runBody(le)) break;
+      }
+      return next;
+    }
+
+    // loop N  (fixed count)
+    const countMatch = header.match(/^loop\s+(\d+)$/);
+    if(countMatch){
+      const n = parseInt(countMatch[1]);
+      for(let k=0; k<n; k++){
+        if(!runBody(new Env(env))) break;
+      }
+      return next;
+    }
+
+    // loop (condition) or loop condition
+    const condMatch = header.match(/^loop\s+(.+)$/);
+    if(condMatch){
+      let condStr = condMatch[1].replace(/^\((.+)\)$/, '$1');
+      let safety = 0;
+      while(this.isTruthy(this.evalExpr(condStr, env))){
+        if(++safety > 10000){ this.emit('Error: loop exceeded 10000 iterations'); break; }
+        if(!runBody(new Env(env))) break;
+      }
+      return next;
+    }
+
+    // bare loop (infinite, must break)
+    {
+      let safety = 0;
+      while(true){
+        if(++safety > 10000){ this.emit('Error: loop exceeded 10000 iterations'); break; }
+        if(!runBody(new Env(env))) break;
+      }
+    }
+    return next;
+  }
+
+  // ── fn definition ─────────────────────────────────
+  execFnDef(lines, i, env){
+    const l = lines[i];
+    const baseIndent = l.indent;
+    // fn returnType name(params)
+    const m = l.text.match(/^fn\s+\S+\s+(\w+)\s*\((.*)\)$/);
+    const { block, next } = collectBlock(lines, i+1, baseIndent);
+    if(m){
+      const name = m[1];
+      const paramStr = m[2].trim();
+      const params = paramStr === '' ? [] : paramStr.split(',').map(p => {
+        const parts = p.trim().split(/\s+/);
+        return { type: parts[0], name: parts[1] };
+      });
+      env.set(name, { __type: 'fn', params, body: block, closure: env });
+    }
+    return next;
+  }
+
+  // ── class definition ──────────────────────────────
+  execClassDef(lines, i, env){
+    const l = lines[i];
+    const baseIndent = l.indent;
+    const m = l.text.match(/^class\s+(\w+)\s*\((.*)\)$/);
+    const { block, next } = collectBlock(lines, i+1, baseIndent);
+    if(m){
+      const name = m[1];
+      const paramStr = m[2].trim();
+      const params = paramStr === '' ? [] : paramStr.split(',').map(p => {
+        const parts = p.trim().split(/\s+/);
+        return { type: parts[0], name: parts[1] };
+      });
+      // parse class body: fields and methods
+      const fields = new Map();
+      const methods = new Map();
+      let j=0;
+      while(j < block.length){
+        const bl = block[j];
+        if(bl.text === '' || bl.text.startsWith('#')){ j++; continue; }
+        if(bl.text.startsWith('fn ')){
+          // method def
+          const mm = bl.text.match(/^fn\s+\S+\s+(\w+)\s*\((.*)\)$/);
+          const { block: mb, next: mn } = collectBlock(block, j+1, bl.indent);
+          if(mm){
+            const mname = mm[1];
+            const mParamStr = mm[2].trim();
+            const mParams = mParamStr === '' ? [] : mParamStr.split(',').map(p => {
+              const parts = p.trim().split(/\s+/);
+              return { type: parts[0], name: parts[1] };
+            });
+            methods.set(mname, { __type:'fn', params: mParams, body: mb, closure: env });
+          }
+          j = mn;
+        } else {
+          // field declaration: word this.name = ""
+          const fm = bl.text.match(/^(?:\w+)\s+this\.(\w+)\s*=\s*(.+)$/);
+          if(fm) fields.set(fm[1], this.evalExpr(fm[2].trim(), env));
+          j++;
+        }
+      }
+      env.set(name, { __type: 'class', name, params, fields, methods });
+    }
+    return next;
+  }
+
+  // ── try / catch ───────────────────────────────────
+  execTryCatch(lines, i, env){
+    const baseIndent = lines[i].indent;
+    const { block: tryBlock, next: afterTry } = collectBlock(lines, i+1, baseIndent);
+    let cur = afterTry;
+    let catchBlock = null, catchVar = null;
+    // skip blank/comment to find catch
+    while(cur < lines.length){
+      const cl = lines[cur];
+      if(cl.text === '' || cl.text.startsWith('#')){ cur++; continue; }
+      if(cl.indent === baseIndent && cl.text.startsWith('catch')){
+        const cm = cl.text.match(/^catch\s*\(\s*\w+\s+(\w+)\s*\)$/);
+        catchVar = cm ? cm[1] : null;
+        const { block: cb, next: afterCatch } = collectBlock(lines, cur+1, baseIndent);
+        catchBlock = cb;
+        cur = afterCatch;
+        break;
+      } else {
+        break;
+      }
+    }
+    try {
+      this.execBlock(tryBlock, 0, -1, new Env(env));
+    } catch(e){
+      if(e instanceof BreakSignal || e instanceof ContinueSignal || e instanceof ReturnSignal) throw e;
+      if(catchBlock){
+        const ce = new Env(env);
+        if(catchVar) ce.set(catchVar, e instanceof GSError ? e.message : String(e.message || e));
+        this.execBlock(catchBlock, 0, -1, ce);
+      }
+    }
+    return cur;
+  }
+
+  // ── call a fn object ──────────────────────────────
+  callFn(fn, args, thisObj=null){
+    const callEnv = new Env(fn.closure);
+    if(thisObj) callEnv.set('this', thisObj);
+    fn.params.forEach((p, idx) => {
+      if(p.name && p.name !== 'this') callEnv.set(p.name, args[idx] !== undefined ? args[idx] : null);
+    });
+    // provide 'this' shorthand for instance methods
+    if(thisObj instanceof GSInstance){
+      // proxy: reading/writing this.x via env calls
+      callEnv.setThisObj(thisObj);
+    }
+    try {
+      this.execBlock(fn.body, 0, -1, callEnv);
+    } catch(s){
+      if(s instanceof ReturnSignal) return s.value;
+      throw s;
+    }
+    return null;
+  }
+
+  // ── expression evaluator ──────────────────────────
+  evalExpr(expr, env){
+    expr = expr.trim();
+    if(!expr) return null;
+
+    // ── ternary: EXPR ? EXPR : EXPR
+    // Find the '?' that isn't inside parens/brackets/strings
+    {
+      const qi = this.findOperatorOutside(expr, '?', ['()', '[]', '""']);
+      if(qi !== -1 && expr[qi+1] !== '?'){
+        const cond = expr.slice(0,qi).trim();
+        const rest = expr.slice(qi+1).trim();
+        const ci = this.findOperatorOutside(rest, ':', ['()', '[]', '""']);
+        if(ci !== -1){
+          const thenE = rest.slice(0,ci).trim();
+          const elseE = rest.slice(ci+1).trim();
+          return this.isTruthy(this.evalExpr(cond,env)) ? this.evalExpr(thenE,env) : this.evalExpr(elseE,env);
+        }
+      }
+    }
+
+    // ── null coalescing: ??
+    {
+      const qi = this.findOpStr(expr, '??');
+      if(qi !== -1){
+        const left = this.evalExpr(expr.slice(0,qi).trim(), env);
+        if(left !== null && left !== undefined) return left;
+        return this.evalExpr(expr.slice(qi+2).trim(), env);
+      }
+    }
+
+    // ── logical or / and
+    {
+      const oi = this.findOpStr(expr, ' or ');
+      if(oi !== -1){
+        const l = this.evalExpr(expr.slice(0,oi).trim(),env);
+        if(this.isTruthy(l)) return l;
+        return this.evalExpr(expr.slice(oi+4).trim(),env);
+      }
+    }
+    {
+      const ai = this.findOpStr(expr, ' and ');
+      if(ai !== -1){
+        const l = this.evalExpr(expr.slice(0,ai).trim(),env);
+        if(!this.isTruthy(l)) return l;
+        return this.evalExpr(expr.slice(ai+5).trim(),env);
+      }
+    }
+
+    // ── comparison operators (right to left to get leftmost)
+    for(const op of ['not has', 'has', '!=', '==', '<=', '>=', '<', '>']){
+      const idx = this.findOpStr(expr, op.startsWith('not') || op==='has' ? ` ${op} ` : op);
+      if(idx !== -1){
+        const sepLen = (op==='has'||op==='not has') ? op.length+2 : op.length;
+        const lhs = this.evalExpr(expr.slice(0, idx).trim(), env);
+        const rhs = this.evalExpr(expr.slice(idx + sepLen).trim(), env);
+        switch(op){
+          case '==': return this.valuesEqual(lhs,rhs);
+          case '!=': return !this.valuesEqual(lhs,rhs);
+          case '<':  return lhs < rhs;
+          case '>':  return lhs > rhs;
+          case '<=': return lhs <= rhs;
+          case '>=': return lhs >= rhs;
+          case 'has': return (lhs instanceof GSList) ? lhs.has(rhs) : (lhs instanceof GSDict ? lhs.has(rhs) : false);
+          case 'not has': return (lhs instanceof GSList) ? !lhs.has(rhs) : (lhs instanceof GSDict ? !lhs.has(rhs) : true);
+        }
+      }
+    }
+
+    // ── not
+    if(expr.startsWith('not ')){
+      return !this.isTruthy(this.evalExpr(expr.slice(4).trim(), env));
+    }
+
+    // ── addition / subtraction (left-to-right, skip inside brackets/parens/strings)
+    {
+      const idx = this.findLastBinaryAddSub(expr);
+      if(idx !== -1){
+        const op = expr[idx];
+        const lhs = this.evalExpr(expr.slice(0,idx).trim(), env);
+        const rhs = this.evalExpr(expr.slice(idx+1).trim(), env);
+        if(op==='+') return (typeof lhs === 'string' || typeof rhs === 'string') ? gsStr(lhs)+gsStr(rhs) : lhs+rhs;
+        if(op==='-') return lhs - rhs;
+      }
+    }
+
+    // ── multiply / divide / modulo
+    {
+      const idx = this.findLastBinaryMulDiv(expr);
+      if(idx !== -1){
+        const op = expr[idx];
+        const lhs = this.evalExpr(expr.slice(0,idx).trim(), env);
+        const rhs = this.evalExpr(expr.slice(idx+1).trim(), env);
+        if(op==='*') return lhs * rhs;
+        if(op==='/') return lhs / rhs;
+        if(op==='%') return lhs % rhs;
+      }
+    }
+
+    // ── exponent **
+    {
+      const idx = this.findOpStr(expr, '**');
+      if(idx !== -1){
+        const lhs = this.evalExpr(expr.slice(0,idx).trim(), env);
+        const rhs = this.evalExpr(expr.slice(idx+2).trim(), env);
+        return Math.pow(lhs, rhs);
+      }
+    }
+
+    // ── unary minus
+    if(expr.startsWith('-')){
+      return -this.evalExpr(expr.slice(1).trim(), env);
+    }
+
+    // ── parenthesised expression
+    if(expr.startsWith('(') && expr.endsWith(')')){
+      return this.evalExpr(expr.slice(1,-1), env);
+    }
+
+    // ── string literal (double-quoted, with interpolation)
+    if(expr.startsWith('"') && expr.endsWith('"')){
+      const inner = expr.slice(1,-1);
+      return inner.replace(/\{([^}]+)\}/g, (_,v) => gsStr(this.evalExpr(v.trim(), env)));
+    }
+
+    // ── pure string (p"...")
+    if(expr.startsWith('p"') && expr.endsWith('"')){
+      return expr.slice(2,-1);
+    }
+
+    // ── list literal
+    if(expr.startsWith('[') && expr.endsWith(']')){
+      const inner = expr.slice(1,-1).trim();
+      if(!inner) return new GSList([]);
+      const items = this.splitArgs(inner).map(a => this.evalExpr(a.trim(), env));
+      return new GSList(items);
+    }
+
+    // ── dict literal: {"key" = val, ...}
+    if(expr.startsWith('{') && expr.endsWith('}')){
+      const d = new GSDict();
+      const inner = expr.slice(1,-1).trim();
+      if(inner){
+        const pairs = this.splitArgs(inner);
+        for(const p of pairs){
+          const eqIdx = p.indexOf('=');
+          if(eqIdx !== -1){
+            const k = this.evalExpr(p.slice(0,eqIdx).trim(), env);
+            const v = this.evalExpr(p.slice(eqIdx+1).trim(), env);
+            d.set(k, v);
+          }
+        }
+      }
+      return d;
+    }
+
+    // ── number literal
+    if(/^-?\d+(\.\d+)?$/.test(expr)) return Number(expr);
+
+    // ── bool / null literals
+    if(expr === 'true') return true;
+    if(expr === 'false') return false;
+    if(expr === 'null') return null;
+
+    // ── new ClassName(args)
+    const newMatch = expr.match(/^new\s+(\w+)\s*\((.*)\)$/);
+    if(newMatch){
+      const cls = env.get(newMatch[1]);
+      if(cls && cls.__type === 'class'){
+        const args = newMatch[2].trim() ? this.splitArgs(newMatch[2]).map(a => this.evalExpr(a.trim(), env)) : [];
+        return new GSInstance(cls, args, env);
+      }
+    }
+
+    // ── toInt / toFloat / toStr built-ins
+    if(expr.startsWith('toInt(')){
+      const inner = this.extractCallArg(expr, 'toInt');
+      const v = this.evalExpr(inner, env);
+      const n = parseInt(v);
+      if(isNaN(n)) throw new GSError(`cannot convert "${v}" to int`);
+      return n;
+    }
+    if(expr.startsWith('toFloat(') || expr.startsWith('toDec(')){
+      const fn2 = expr.startsWith('toFloat') ? 'toFloat' : 'toDec';
+      const inner = this.extractCallArg(expr, fn2);
+      const v = this.evalExpr(inner, env);
+      const n = parseFloat(v);
+      if(isNaN(n)) throw new GSError(`cannot convert "${v}" to dec`);
+      return n;
+    }
+    if(expr.startsWith('toStr(')){
+      const inner = this.extractCallArg(expr, 'toStr');
+      return gsStr(this.evalExpr(inner, env));
+    }
+
+    // ── range(n) / range(a,b) — returns GSList
+    if(expr.startsWith('range(')){
+      const inner = this.extractCallArg(expr, 'range');
+      const args2 = this.splitArgs(inner).map(a => Number(this.evalExpr(a.trim(), env)));
+      const [from, to2] = args2.length===1 ? [0,args2[0]] : [args2[0],args2[1]];
+      const items = [];
+      for(let v=from; v<to2; v++) items.push(v);
+      return new GSList(items);
+    }
+
+    // ── method/property chaining: expr.method(args) or expr.prop
+    {
+      const dotIdx = this.findDotAccess(expr);
+      if(dotIdx !== -1){
+        const objExpr = expr.slice(0, dotIdx);
+        const rest2 = expr.slice(dotIdx+1);
+        const obj = this.evalExpr(objExpr, env);
+
+        // method call: .method(args)
+        const callM = rest2.match(/^(\w+)\s*\((.*)\)$/);
+        if(callM){
+          const mname = callM[1];
+          const argStr = callM[2].trim();
+          const args2 = argStr ? this.splitArgs(argStr).map(a => this.evalExpr(a.trim(), env)) : [];
+
+          if(obj instanceof GSList){
+            switch(mname){
+              case 'len': return obj.len();
+              case 'append': obj.append(args2[0]); return null;
+              case 'remove': obj.remove(args2[0]); return null;
+              case 'has': return obj.has(args2[0]);
+            }
+          }
+          if(obj instanceof GSDict){
+            switch(mname){
+              case 'len': return obj.map.size;
+              case 'has': return obj.has(args2[0]);
+              case 'remove': obj.map.delete(args2[0]); return null;
+            }
+          }
+          if(obj instanceof GSInstance){
+            const method = obj.classDef.methods.get(mname);
+            if(method){
+              const menv = new Env(method.closure);
+              menv.setThisObj(obj);
+              // expose all instance fields directly so {this.name} resolves
+              for(const [k,v] of obj.fields) menv.set('this.'+k, v);
+              method.params.forEach((p,idx)=>{
+                if(p.name && p.name !== 'this') menv.set(p.name, args2[idx] !== undefined ? args2[idx] : null);
+              });
+              try { this.execBlock(method.body, 0, -1, menv); }
+              catch(s){ if(s instanceof ReturnSignal) return s.value; throw s; }
+              return null;
+            }
+          }
+          throw new GSError(`no method '${mname}' on ${gsStr(obj)}`);
+        }
+
+        // property access: .prop
+        const propM = rest2.match(/^(\w+)$/);
+        if(propM){
+          const prop = propM[1];
+          if(obj instanceof GSInstance) return obj.get(prop);
+          if(obj instanceof GSList && prop==='len') return obj.len();
+          throw new GSError(`no property '${prop}' on ${gsStr(obj)}`);
+        }
+      }
+    }
+
+    // ── subscript: expr[key]
+    {
+      const subM = expr.match(/^(.+)\[(.+)\]$/);
+      if(subM){
+        const obj = this.evalExpr(subM[1].trim(), env);
+        const key = this.evalExpr(subM[2].trim(), env);
+        if(obj instanceof GSList) return obj.get(key);
+        if(obj instanceof GSDict) return obj.get(key);
+      }
+    }
+
+    // ── function call: name(args)
+    const callMatch = expr.match(/^(\w+)\s*\((.*)\)$/s);
+    if(callMatch){
+      const fname = callMatch[1];
+      const fn = env.get(fname);
+      if(fn && fn.__type === 'fn'){
+        const argStr = callMatch[2].trim();
+        const args2 = argStr ? this.splitArgs(argStr).map(a => this.evalExpr(a.trim(), env)) : [];
+        return this.callFn(fn, args2);
+      }
+    }
+
+    // ── variable lookup
+    try { return env.get(expr); } catch(e){ /* fall through */ }
+
+    throw new GSError(`cannot evaluate: ${expr}`);
+  }
+
+  // ─── Operator search helpers ──────────────────────
+
+  // Find last index of a binary + or - that's not inside parens/brackets/strings
+  findLastBinaryAddSub(expr){
+    let depth = 0, inStr = false, strChar = '';
+    let result = -1;
+    for(let i=0; i<expr.length; i++){
+      const c = expr[i];
+      if(inStr){ if(c===strChar) inStr=false; continue; }
+      if(c==='"'){ inStr=true; strChar=c; continue; }
+      if(c==='('||c==='['||c==='{') depth++;
+      else if(c===')'||c===']'||c==='}') depth--;
+      else if(depth===0 && (c==='+'||c==='-') && i>0){
+        // not ** or unary after operator
+        const prev = expr[i-1];
+        if(prev !== '*' && prev !== '*') result = i;
+      }
+    }
+    return result;
+  }
+
+  findLastBinaryMulDiv(expr){
+    let depth=0, inStr=false, strChar='';
+    let result=-1;
+    for(let i=0; i<expr.length; i++){
+      const c=expr[i];
+      if(inStr){ if(c===strChar) inStr=false; continue; }
+      if(c==='"'){ inStr=true; strChar=c; continue; }
+      if(c==='('||c==='['||c==='{') depth++;
+      else if(c===')'||c===']'||c==='}') depth--;
+      else if(depth===0 && (c==='*'||c==='/'||c==='%') && i>0){
+        // skip **
+        if(c==='*' && (expr[i+1]==='*'||expr[i-1]==='*')) continue;
+        result=i;
+      }
+    }
+    return result;
+  }
+
+  // Find first occurrence of opStr outside parens/brackets/strings
+  findOpStr(expr, opStr){
+    let depth=0, inStr=false, strChar='';
+    for(let i=0; i<=expr.length-opStr.length; i++){
+      const c=expr[i];
+      if(inStr){ if(c===strChar) inStr=false; continue; }
+      if(c==='"'){ inStr=true; strChar=c; continue; }
+      if(c==='('||c==='['||c==='{') depth++;
+      else if(c===')'||c===']'||c==='}') depth--;
+      if(depth===0 && expr.slice(i,i+opStr.length)===opStr) return i;
+    }
+    return -1;
+  }
+
+  findOperatorOutside(expr, op, _ignored){
+    return this.findOpStr(expr, op);
+  }
+
+  // Find the dot in a.b that is not inside parens/brackets/strings
+  findDotAccess(expr){
+    let depth=0, inStr=false, strChar='';
+    let lastDot=-1;
+    for(let i=0; i<expr.length; i++){
+      const c=expr[i];
+      if(inStr){ if(c===strChar) inStr=false; continue; }
+      if(c==='"'){ inStr=true; strChar=c; continue; }
+      if(c==='('||c==='['||c==='{') depth++;
+      else if(c===')'||c===']'||c==='}') depth--;
+      else if(depth===0 && c==='.') lastDot=i;
+    }
+    // make sure left side is a valid identifier or ends with ) or ]
+    if(lastDot>0){
+      const left=expr.slice(0,lastDot);
+      if(left.match(/\w$/) || left.endsWith(')') || left.endsWith(']')) return lastDot;
+    }
+    return -1;
+  }
+
+  // Split comma-separated args respecting nesting
+  splitArgs(str){
+    const args=[], len=str.length;
+    let depth=0, inStr=false, strChar='', cur='';
+    for(let i=0; i<len; i++){
+      const c=str[i];
+      if(inStr){ cur+=c; if(c===strChar) inStr=false; continue; }
+      if(c==='"'){ inStr=true; strChar=c; cur+=c; continue; }
+      if(c==='('||c==='['||c==='{') { depth++; cur+=c; continue; }
+      if(c===')'||c===']'||c==='}') { depth--; cur+=c; continue; }
+      if(c===','&&depth===0){ args.push(cur.trim()); cur=''; continue; }
+      cur+=c;
+    }
+    if(cur.trim()) args.push(cur.trim());
+    return args;
+  }
+
+  extractCallArg(line, fnName){
+    const start = line.indexOf(fnName+'(') + fnName.length + 1;
+    // find matching close paren
+    let depth=1, i=start;
+    while(i<line.length && depth>0){
+      if(line[i]==='(') depth++;
+      else if(line[i]===')') depth--;
+      i++;
+    }
+    return line.slice(start, i-1);
+  }
+
+  isTruthy(v){
+    if(v===null||v===undefined||v===false||v===0||v==='') return false;
+    return true;
+  }
+
+  valuesEqual(a,b){
+    if(a instanceof GSList && b instanceof GSList) return JSON.stringify(a.items)===JSON.stringify(b.items);
+    return a===b;
+  }
+
+  
+}
+
+// ── Environment (scope chain) ─────────────────────
+class Env {
+  constructor(parent=null){
+    this.parent = parent;
+    this.vars = new Map();
+    this._thisObj = null;
+  }
+  setThisObj(obj){ this._thisObj = obj; }
+  set(name, val){ this.vars.set(name, val); }
+  get(name){
+    if(name.startsWith('this.')){
+      const obj = this._findThisObj();
+      if(obj) return obj.get(name.slice(5));
+    }
+    if(this.vars.has(name)) return this.vars.get(name);
+    if(this.parent) return this.parent.get(name);
+    throw new GSError(`undefined variable '${name}'`);
+  }
+
+  _findThisObj(){
+    if(this._thisObj) return this._thisObj;
+    if(this.parent) return this.parent._findThisObj();
+    return null;
+  }
+  del(name){
+    if(this.vars.has(name)){ this.vars.delete(name); return; }
+    if(this.parent) this.parent.del(name);
+  }
+  update(name, val){
+  if(this.vars.has(name)){ this.vars.set(name, val); return; }
+  if(this.parent) { this.parent.update(name, val); return; }
+  this.vars.set(name, val); // fallback: define it
+}
+}
+
+// ─────────────────────────────────────────────────
+//  UI
+// ─────────────────────────────────────────────────
+
+CodeMirror.defineMode('gamescript', () => ({
+  token(stream) {
+    if(stream.match(/^#.*/)) return 'comment';
+    if(stream.match(/^"(?:[^"\\]|\\.)*"/)) return 'string';
+    if(stream.match(/^p"(?:[^"\\]|\\.)*"/)) return 'string';
+    if(stream.match(/^\b(if|elif|else|then|match|case|loop|in|break|continue|return|fn|try|catch|del|and|or|not|has)\b/)) return 'keyword';
+    if(stream.match(/^\b(int|dec|word|bool|list|dict|void|const|global)\b/)) return 'type';
+    if(stream.match(/^\b(true|false|null)\b/)) return 'atom';
+    if(stream.match(/^\b(print|take|toInt|toDec|toStr|range|new)\b/)) return 'builtin';
+    if(stream.match(/^\b\d+(\.\d+)?\b/)) return 'number';
+    if(stream.match(/^(\*\*|[+\-*/%=<>!?:]+)/)) return 'operator';
+    stream.next();
+    return null;
+  }
+}));
+
+const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+  lineNumbers: true,
+  mode: 'gamescript',
+  theme: 'dracula',
+  autoCloseBrackets: true,
+  matchBrackets: true,
+  indentUnit: 4,
+  tabSize: 4,
+  lineWrapping: true
+});
+
+const interp = new GameScriptInterpreter();
+const outputDiv = document.getElementById('output');
+const runBtn    = document.getElementById('run-btn');
+const clearBtn  = document.getElementById('clear-btn');
+
+function displayOutput(results){
+  outputDiv.innerHTML = '<div class="output-prompt">GameScript Playground v0.3.0</div>';
+  if(results.length === 0){
+    outputDiv.innerHTML += '<div class="output-line">(no output)</div>';
+  } else {
+    results.forEach(r => {
+      const d = document.createElement('div');
+      d.className = 'output-line' + (r.isError ? ' output-error' : '');
+      d.textContent = r.text;
+      outputDiv.appendChild(d);
+    });
+  }
+  outputDiv.innerHTML += '<div class="output-prompt mt-2">→ Program finished</div>';
+}
+
+runBtn.addEventListener('click', () => {
+  const results = interp.run(editor.getValue());
+  displayOutput(results);
+});
+
+clearBtn.addEventListener('click', () => {
+  editor.setValue('');
+  outputDiv.innerHTML = '<div class="output-prompt">GameScript Playground v0.3.0</div><div class="output-prompt">Click Run to execute code →</div>';
+});
+
+const examples = {
+  basics: `#Printing text
+print("Hello world")`,
+
+  loops: `#This will loop 3 times
+loop 3
+  print("tick")
+
+#This is a for loop
+loop int i in range(5)
+    print(i)
+    
+int cnt = 0
+
+#This will loop forever until 'break'
+loop
+  cnt += 1
+  print(cnt)
+  if cnt == 5
+    break`,
+
+  lists: `list<word> fruits = ["apple", "banana", "cherry"]
+fruits.append("orange")
+print(fruits.len())
+print(fruits[0])
+loop word fruit in fruits
+    print(fruit)`,
+
+  functions: `fn int add(int a, int b)
+    return a + b
+
+print(add(3, 7))
+
+try
+    int bad = toInt("oops")
+catch (word err)
+    print("caught: {err}")`
+};
+
+document.querySelectorAll('.example-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.example-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const ex = btn.dataset.example;
+    if(examples[ex]) editor.setValue(examples[ex]);
+  });
+});
+
+// Run the default example on load
+const urlParams = new URLSearchParams(location.search);
+const urlCode = urlParams.get('code');
+editor.setValue(urlCode ? decodeURIComponent(urlCode) : examples.basics);
+setTimeout(() => {
+  const results = interp.run(editor.getValue());
+  displayOutput(results);
+}, 150);
+</script>
 </body>
 </html>
