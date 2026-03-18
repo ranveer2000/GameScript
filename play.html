@@ -66,47 +66,10 @@
       color: #fff; padding: 0.15rem 0.5rem;
       font-family: 'Fira Code', monospace; font-size: 14px; outline: none;
     }
-    @media (max-width: 480px) {
-  .editor-header, .output-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .toolbar {
-    width: 100%;
-  }
-
-  .toolbar .button {
-    flex: 1;
-    text-align: center;
-  }
-
-  .example-selector {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .example-btn {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-  }
-
-  .take-input {
-    font-size: 16px; /* prevents iOS auto-zoom on input focus */
-    width: 100%;
-  }
-
-  .take-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .output-content {
-    font-size: 13px;
-    padding: 1rem;
-  }
-}
+    @media (max-width: 768px) {
+      .playground-container { flex-direction: column; }
+      .CodeMirror, .output-content { height: 300px; }
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
