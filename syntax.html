@@ -185,10 +185,90 @@
     padding: 1.25rem;
   }
 }
-    
+    /* === Syntax page dark mode === */
+body.dark-mode .syntax-nav {
+    background: rgba(30, 30, 34, 0.85);
+    border: 1px solid rgba(63, 175, 164, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .syntax-nav-item {
+    color: #5ecfbf;
+}
+
+body.dark-mode .syntax-nav-item:hover {
+    background: rgba(240, 106, 77, 0.12);
+}
+
+body.dark-mode .syntax-content {
+    background: rgba(30, 30, 34, 0.85);
+    border: 1px solid rgba(63, 175, 164, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .syntax-content h4 {
+    color: #5ecfbf;
+}
+
+body.dark-mode .syntax-content p {
+    color: #a0a0b0;
+}
+
+body.dark-mode .intro-box {
+    background: rgba(63, 175, 164, 0.08);
+    color: #c8c8d4;
+}
+
+body.dark-mode .tip-box {
+    background: rgba(240, 106, 77, 0.08);
+    color: #a0a0b0;
+}
+
+body.dark-mode code {
+    background: rgba(255, 255, 255, 0.08);
+    color: #5ecfbf;
+}
+
+body.dark-mode .content-divider {
+    border-top-color: rgba(63, 175, 164, 0.15);
+}
+
+body.dark-mode .section-label {
+    color: #3fafa4;
+}
+/* === Playground dark mode borders === */
+body.dark-mode .CodeMirror {
+    border: 1px solid rgba(63, 175, 164, 0.3);
+    box-shadow: 0 0 20px rgba(63, 175, 164, 0.05);
+}
+
+body.dark-mode .output-content {
+    border: 1px solid rgba(240, 106, 77, 0.3);
+    box-shadow: 0 0 20px rgba(240, 106, 77, 0.05);
+}
+body.dark-mode .code-block {
+    border: 1px solid rgba(63, 175, 164, 0.3);
+    box-shadow: 0 0 20px rgba(63, 175, 164, 0.05);
+}
+
+body.dark-mode .output-box {
+    border: 1px solid rgba(240, 106, 77, 0.3);
+    box-shadow: 0 0 20px rgba(240, 106, 77, 0.05);
+    border-left: 3px solid #f06a4d;
+}
+body.dark-mode .syntax-nav-item.active {
+    background: transparent;
+    color: #5ecfbf;
+    border: 1px solid rgba(63, 175, 164, 0.5);
+    box-shadow: 0 0 12px rgba(63, 175, 164, 0.1);
+}
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
+
+<button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+    🌙
+</button>
 
 <header class="navbar-bar">
   <div class="navbar-content container mx-auto flex items-center justify-between p-4 flex-wrap">

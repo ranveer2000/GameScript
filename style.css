@@ -612,3 +612,96 @@ transform: scale(1.04);
     transform: scale(1.04);
     color:#ff7c5f;
 }
+
+/* === Dark Mode === */
+body.dark-mode {
+    background: #0a0a0c;
+    background-size: 400% 400%;
+    color: #e0e0e8;
+}
+
+body.dark-mode::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg,
+        #1f6f78 0%,
+        #3fafa4 30%,
+        #ff9e57 70%,
+        #f06a4d 100%);
+    background-size: 400% 400%;
+    animation: gradientMove 120s ease infinite;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.dark-mode .card-content,
+.dark-mode .card1,
+.dark-mode .card2 {
+    background-color: #1e1e22;
+    color: #e0e0e8;
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3,
+.dark-mode h4, .dark-mode h5, .dark-mode h6 {
+    color: #c8c8d4;
+}
+
+.dark-mode .card-content,
+.dark-mode .card1,
+.dark-mode .card2 {
+    background-color: rgba(30, 30, 34, 0.85);
+    border: 1px solid rgba(63, 175, 164, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    color: #e0e0e8;
+    backdrop-filter: blur(10px);
+}
+
+.dark-mode p { color: #a0a0b0; }
+
+.dark-mode .navbar-bar {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .stage-container {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.dark-mode .current-stage {
+    background: rgba(0, 0, 0, 0.4);
+    color: #5ecfbf;
+}
+
+.dark-mode .stage-label { color: #a0a0b0; }
+
+/* Toggle button */
+.dark-mode-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 999;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.25s ease;
+}
+
+.dark-mode-toggle:hover {
+    background: rgba(255,255,255,0.25);
+    transform: scale(1.05);
+}
+
+.dark-mode .bot-bar{
+    background: linear-gradient(to bottom,#00000000,#031f22);
+    padding: clamp(1rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem);
+    width: 100%;
+    box-sizing: border-box;
+}

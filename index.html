@@ -10,7 +10,13 @@
   <script src="main.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/trianglify@4/dist/trianglify.min.js"></script>
 </head>
+
 <body class="flex flex-col min-h-screen">
+
+  <!-- Dark Mode Toggle Button -->
+<button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+    🌙
+</button>
 
 <!-- Navbar -->
 <header class="navbar-bar">
@@ -73,13 +79,13 @@
     <!-- Stage 3 (Current/Active) -->
     <div class="stage-item">
       <div class="stage-circle completed">3</div>
-      <div class="stage-label active-label">Working</div>
+      <div class="stage-label">Working</div>
     </div>
     
     <!-- Stage 4 (Upcoming) -->
     <div class="stage-item">
       <div class="stage-circle active">4</div>
-      <div class="stage-label">Refining</div>
+      <div class="stage-label active-label">Refining</div>
     </div>
     
     <!-- Stage 5 (Upcoming) -->
@@ -91,12 +97,12 @@
   
   <!-- Progress line (visual connection between stages) -->
   <div class="progress-line">
-    <div class="progress-fill" style="width: 75%;"></div> <!-- 2.5/5 stages = 50% -->
+    <div class="progress-fill" style="width: 72.5%;"></div> <!-- 2.5/5 stages = 50% -->
   </div>
   
   <!-- Current stage indicator text -->
   <div class="current-stage">
-    Currently on Stage 4: Refining the language
+    Currently on Stage 3: Making the language function
   </div>
 </div>
       </div>
@@ -110,7 +116,8 @@
       <h5>HUGE UPDATE</h5>
       <p>You can now try GameScript(v0.3.0) on the playground, it may be broken as it simulates the language and doesn't run it <br> please check our 'syntax' and 'playground'</p>
       <a href="play.html" class="button">Playground &rarr;</a>
-      <a href="syntax.html" class="button" style="background: #3fafa4;">Syntax &rarr;</a>
+      <br>
+      <a href="syntax.html" class="button"">Syntax &rarr;</a>
       </div>
     </div>
   </div>
