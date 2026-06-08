@@ -170,7 +170,7 @@ body.dark-mode .example-btn.active {
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
         <div class="text-left">
           <h6 class="text-[#1f6f78] mb-2">Variables</h6>
-          <p class="text-sm">int, dec, word, bool, list, dict</p>
+          <p class="text-sm">int, flt, str, bool, list, dict</p>
         </div>
         <div class="text-left">
           <h6 class="text-[#1f6f78] mb-2">Operators</h6>
@@ -440,7 +440,7 @@ class GameScriptInterpreter {
     }
 
     // typed declaration: int x = ...  list<T> x = ...
-    const typedDecl = line.match(/^(list<.+?>+|dict<.+?>+|int|dec|word|bool)\s+(?!this\.)(\w+)\s*=\s*(.+)$/);
+    const typedDecl = line.match(/^(list<.+?>+|dict(?:<[^>]+>)?|int|flt|str|bool)\s+(?!this\.)(\w+)\s*=\s*(.+)$/);
     if(typedDecl){
       const [_, declType, varName, valExpr] = typedDecl;
       let val = await this.evalExpr(valExpr.trim(), env);
@@ -449,16 +449,17 @@ class GameScriptInterpreter {
         const raw = val.raw;
         switch(declType){
           case 'int': { const n=parseInt(raw); if(isNaN(n)) throw new GSError(`take(): cannot convert "${raw}" to int`); val=n; break; }
-          case 'dec': { const n=parseFloat(raw); if(isNaN(n)) throw new GSError(`take(): cannot convert "${raw}" to dec`); val=n; break; }
+          case 'flt': { const n=parseFloat(raw); if(isNaN(n)) throw new GSError(`take(): cannot convert "${raw}" to flt`); val=n; break; }
           case 'bool': { if(raw==='true') val=true; else if(raw==='false') val=false; else throw new GSError(`take(): cannot convert "${raw}" to bool`); break; }
           default: val=raw;
         }
       }
       const checks = {
         'int':  v => typeof v === 'number' && Number.isInteger(v),
-        'dec':  v => typeof v === 'number',
-        'word': v => typeof v === 'string',
+        'flt':  v => typeof v === 'number',
+        'str': v => typeof v === 'string',
         'bool': v => typeof v === 'boolean',
+        'dict': v => v instanceof GSDict,
       };
       const baseType = declType.split('<')[0];
       if(checks[baseType] && !checks[baseType](val))
@@ -505,7 +506,8 @@ class GameScriptInterpreter {
     const augAssign = line.match(/^(\w+)\s*(\+=|-=|\*=|\/=|%=)\s*(.+)$/);
     if(augAssign){
       const cur = env.get(augAssign[1]);
-      const rhs = await this.evalExpr(augAssign[3].trim(), env);
+      let rhs = await this.evalExpr(augAssign[3].trim(), env);
+      if(rhs && rhs.__take) rhs = rhs.raw;
       let res;
       switch(augAssign[2]){
         case '+=': res = cur + rhs; break;
@@ -521,7 +523,10 @@ class GameScriptInterpreter {
     // plain assign
     const plainAssign = line.match(/^(\w+)\s*=\s*(.+)$/);
     if(plainAssign){
-      env.update(plainAssign[1], await this.evalExpr(plainAssign[2].trim(), env));
+      let val = await this.evalExpr(plainAssign[2].trim(), env);
+      // unwrap take() result — treat as string by default
+      if(val && val.__take) val = val.raw;
+      env.update(plainAssign[1], val);
       return i+1;
     }
 
@@ -539,7 +544,8 @@ class GameScriptInterpreter {
     while(cur < lines.length){
       const l = lines[cur];
       if(l.text===''||l.text.startsWith('#')){ cur++; continue; }
-      if(l.indent < baseIndent || l.indent > baseIndent) break;
+      if(l.indent < baseIndent) break;
+      if(l.indent > baseIndent) break;
       if(l.text.startsWith('if ')||l.text.startsWith('elif ')){
         const condStr = l.text.replace(/^(?:if|elif)\s+/,'').replace(/^\((.+)\)$/,'$1');
         const {block,next} = collectBlock(lines, cur+1, baseIndent);
@@ -607,8 +613,8 @@ class GameScriptInterpreter {
     const iterRange = header.match(/^loop\s+\w+\s+(\w+)\s+in\s+range\((.+)\)$/);
     if(iterRange){
       const varName = iterRange[1];
-      const args = iterRange[2].split(',').map(a => Number(this.evalExprSync(a.trim(), env)));
-      const [from,to] = args.length===1 ? [0,args[0]] : [args[0],args[1]];
+      const args = await Promise.all(iterRange[2].split(',').map(a => this.evalExpr(a.trim(), env)));
+      const [from,to] = args.length===1 ? [0,Number(args[0])] : [Number(args[0]),Number(args[1])];
       for(let v=from; v<to; v++){
         const le=new Env(env); le.set(varName,v);
         if(!await runBody(le)) break;
@@ -616,7 +622,7 @@ class GameScriptInterpreter {
       return next;
     }
 
-    // loop word x in list
+    // loop str x in list
     const iterList = header.match(/^loop\s+\w+\s+(\w+)\s+in\s+(.+)$/);
     if(iterList){
       const varName = iterList[1];
@@ -644,7 +650,7 @@ class GameScriptInterpreter {
       let safety=0;
       while(this.isTruthy(await this.evalExpr(condStr, env))){
         if(++safety>10000){ this.emit('Error: loop exceeded 10000 iterations',true); break; }
-        if(!await runBody(env)) break;
+        if(!await runBody(new Env(env))) break;
       }
       return next;
     }
@@ -807,14 +813,12 @@ class GameScriptInterpreter {
 
     if(expr.startsWith('not ')) return !this.isTruthy(await this.evalExpr(expr.slice(4).trim(),env));
 
-    // add/sub
-    { const idx=this.findLastBinaryAddSub(expr);
+    // exponent (higher precedence than mul/div)
+    { const idx=this.findOpStr(expr,'**');
       if(idx!==-1){
-        const op=expr[idx];
         const lhs=await this.evalExpr(expr.slice(0,idx).trim(),env);
-        const rhs=await this.evalExpr(expr.slice(idx+1).trim(),env);
-        if(op==='+') return (typeof lhs==='string'||typeof rhs==='string') ? gsStr(lhs)+gsStr(rhs) : lhs+rhs;
-        if(op==='-') return lhs-rhs;
+        const rhs=await this.evalExpr(expr.slice(idx+2).trim(),env);
+        return Math.pow(lhs,rhs);
       }
     }
 
@@ -830,16 +834,19 @@ class GameScriptInterpreter {
       }
     }
 
-    // exponent
-    { const idx=this.findOpStr(expr,'**');
+    // add/sub
+    { const idx=this.findLastBinaryAddSub(expr);
       if(idx!==-1){
+        const op=expr[idx];
         const lhs=await this.evalExpr(expr.slice(0,idx).trim(),env);
-        const rhs=await this.evalExpr(expr.slice(idx+2).trim(),env);
-        return Math.pow(lhs,rhs);
+        const rhs=await this.evalExpr(expr.slice(idx+1).trim(),env);
+        if(op==='+') return (typeof lhs==='string'||typeof rhs==='string') ? gsStr(lhs)+gsStr(rhs) : lhs+rhs;
+        if(op==='-') return lhs-rhs;
       }
     }
 
-    if(expr.startsWith('-')) return -(await this.evalExpr(expr.slice(1).trim(),env));
+    // unary minus (only if no binary op found above)
+    if(expr.startsWith('-')&&!/^-?\d+(\.\d+)?$/.test(expr)) return -(await this.evalExpr(expr.slice(1).trim(),env));
 
     if(expr.startsWith('(')&&expr.endsWith(')')) return this.evalExpr(expr.slice(1,-1),env);
 
@@ -881,7 +888,11 @@ class GameScriptInterpreter {
       const inner=expr.slice(1,-1).trim();
       if(inner){
         for(const p of this.splitArgs(inner)){
-          const eqIdx=p.indexOf('=');
+          // find = that is not part of == or !=
+          let eqIdx=-1;
+          for(let ei=0;ei<p.length;ei++){
+            if(p[ei]==='='&&p[ei-1]!=='!'&&p[ei-1]!=='<'&&p[ei-1]!=='>'&&p[ei-1]!=='='&&p[ei+1]!=='='){eqIdx=ei;break;}
+          }
           if(eqIdx!==-1){
             const k=await this.evalExpr(p.slice(0,eqIdx).trim(),env);
             const v=await this.evalExpr(p.slice(eqIdx+1).trim(),env);
@@ -915,7 +926,7 @@ class GameScriptInterpreter {
     if(expr.startsWith('toFloat(')||expr.startsWith('toDec(')){
       const fn2=expr.startsWith('toFloat')?'toFloat':'toDec';
       const v=await this.evalExpr(this.extractCallArg(expr,fn2),env);
-      const n=parseFloat(v); if(isNaN(n)) throw new GSError(`cannot convert "${v}" to dec`); return n;
+      const n=parseFloat(v); if(isNaN(n)) throw new GSError(`cannot convert "${v}" to flt`); return n;
     }
     if(expr.startsWith('toStr(')){
       return gsStr(await this.evalExpr(this.extractCallArg(expr,'toStr'),env));
@@ -929,8 +940,10 @@ class GameScriptInterpreter {
     }
 
     if(expr.startsWith('range(')){
-      const args2=this.splitArgs(this.extractCallArg(expr,'range')).map(a=>Number(this.evalExprSync(a.trim(),env)));
-      const [from,to2]=args2.length===1?[0,args2[0]]:[args2[0],args2[1]];
+      const inner=this.extractCallArg(expr,'range');
+      const args2=await Promise.all(this.splitArgs(inner).map(a=>this.evalExpr(a.trim(),env)));
+      const nums=args2.map(v=>Number(v));
+      const [from,to2]=nums.length===1?[0,nums[0]]:[nums[0],nums[1]];
       const items=[]; for(let v=from;v<to2;v++) items.push(v);
       return new GSList(items);
     }
@@ -1019,19 +1032,25 @@ class GameScriptInterpreter {
     if(expr==='null') return null;
     if(expr.startsWith('"')&&expr.endsWith('"')) return expr.slice(1,-1);
     try { return env.get(expr); } catch(e){}
-    return 0;
+    throw new GSError(`cannot evaluate: ${expr}`);
   }
 
   // ── operator helpers ──────────────────────────────
   findLastBinaryAddSub(expr){
+    // Find the RIGHTMOST binary +/- at depth 0 (not unary).
+    // A +/- is binary when immediately preceded by an operand character.
     let depth=0,inStr=false,strChar='',result=-1;
+    let prevWasOperand=false;
     for(let i=0;i<expr.length;i++){
       const c=expr[i];
-      if(inStr){if(c===strChar)inStr=false;continue;}
+      if(inStr){if(c===strChar){inStr=false;prevWasOperand=true;}continue;}
       if(c==='"'){inStr=true;strChar=c;continue;}
-      if(c==='('||c==='['||c==='{') depth++;
-      else if(c===')'||c===']'||c==='}') depth--;
-      else if(depth===0&&(c==='+'||c==='-')&&i>0) result=i;
+      if(c===' ') continue;
+      if(c==='('||c==='['||c==='{'){depth++;prevWasOperand=false;continue;}
+      if(c===')'||c===']'||c==='}'){depth--;prevWasOperand=true;continue;}
+      if(depth===0&&(c==='+'||c==='-')&&prevWasOperand) result=i;
+      prevWasOperand=/[\w\d_"'\])]/.test(c)&&c!=='+'&&c!=='-'&&c!=='*'&&c!=='/'&&c!=='%'&&c!=='='&&c!=='<'&&c!=='>'&&c!=='!'&&c!=='?'&&c!==':';
+      if(c===')'||c===']') prevWasOperand=true;
     }
     return result;
   }
@@ -1044,9 +1063,10 @@ class GameScriptInterpreter {
       if(c==='"'){inStr=true;strChar=c;continue;}
       if(c==='('||c==='['||c==='{') depth++;
       else if(c===')'||c===']'||c==='}') depth--;
-      else if(depth===0&&(c==='*'||c==='/'||c==='%')&&i>0){
+      else if(depth===0&&i>0){
+        // skip ** entirely (handled separately)
         if(c==='*'&&(expr[i+1]==='*'||expr[i-1]==='*')) continue;
-        result=i;
+        if(c==='*'||c==='/'||c==='%') result=i;
       }
     }
     return result;
@@ -1127,7 +1147,7 @@ CodeMirror.defineMode('gamescript', () => ({
     if(stream.match(/^p"(?:[^"\\]|\\.)*"/)) return 'string';
     if(stream.match(/^"(?:[^"\\]|\\.)*"/)) return 'string';
     if(stream.match(/^\b(if|elif|else|then|match|case|loop|in|break|continue|return|fn|try|catch|del|and|or|not|has)\b/)) return 'keyword';
-    if(stream.match(/^\b(int|dec|word|bool|list|dict|void|const|global)\b/)) return 'type';
+    if(stream.match(/^\b(int|flt|str|bool|list|dict|void|const|global)\b/)) return 'type';
     if(stream.match(/^\b(true|false|null)\b/)) return 'atom';
     if(stream.match(/^\b(print|take|toInt|toDec|toStr|range|new)\b/)) return 'builtin';
     if(stream.match(/^\b\d+(\.\d+)?\b/)) return 'number';
@@ -1154,46 +1174,83 @@ runBtn.addEventListener('click', () => {
 
 clearBtn.addEventListener('click', () => {
   editor.setValue('');
-  outputDiv.innerHTML = '<div class="output-prompt">GameScript Playground v0.3.0</div><div class="output-prompt">Click Run to execute code &#8594;</div>';
+  outputDiv.innerHTML = '<div class="output-prompt">GameScript Playground v0.4.0</div><div class="output-prompt">Click Run to execute code &#8594;</div>';
 });
 
 const examples = {
-  basics: `#Printing text
-print("Hello world")`,
+  basics: `# Printing text
+print("Hello, World!")
 
-  loops: `#This will loop 3 times
+# Variables
+int age = 25
+flt pi = 3.14
+str name = "GameScript"
+bool ready = true
+
+# String interpolation
+print("Name: {name}, Age: {age}")
+
+# Arithmetic (correct precedence)
+int result = 2 + 3 * 4
+print(result)
+
+# Null coalescing
+str greeting = null ?? "default"
+print(greeting)`,
+
+  loops: `# Count loop
 loop 3
-  print("tick")
+    print("tick")
 
-#This is a for loop
+# Range loop
 loop int i in range(5)
     print(i)
 
+# While-style loop with break
 int cnt = 0
-
-#This will loop forever until 'break'
 loop
-  cnt += 1
-  print(cnt)
-  if cnt == 5
-    break`,
+    cnt += 1
+    print(cnt)
+    if cnt == 5
+        break
 
-  lists: `list<word> fruits = ["apple", "banana", "cherry"]
+# Loop over a list
+list<str> colors = ["red", "green", "blue"]
+loop str c in colors
+    print(c)`,
+
+  lists: `list<str> fruits = ["apple", "banana", "cherry"]
 fruits.append("orange")
 print(fruits.len())
 print(fruits[0])
-loop word fruit in fruits
-    print(fruit)`,
+
+# Iterate
+loop str fruit in fruits
+    print(fruit)
+
+# Dict
+dict scores = {"alice"=100, "bob"=85}
+print(scores.has("alice"))`,
 
   functions: `fn int add(int a, int b)
     return a + b
 
-print(add(3, 7))
+fn str greet(str name)
+    return "Hello, {name}!"
 
+print(add(3, 7))
+print(greet("Ranveer"))
+
+# Ternary
+int x = 10
+str label = x > 5 ? "big" : "small"
+print(label)
+
+# Try/catch
 try
     int bad = toInt("oops")
-catch (word err)
-    print("caught: {err}")`
+catch (str err)
+    print("Caught: {err}")`
 };
 
 document.querySelectorAll('.example-btn').forEach(btn => {

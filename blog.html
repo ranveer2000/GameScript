@@ -3,12 +3,302 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GameScript - syntax</title>
+  <title>GameScript - blog</title>
   <link rel="icon" type="image/svg" href="assets/images/logo.svg">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="main.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/trianglify@4/dist/trianglify.min.js"></script>
+  <style>
+    .syntax-layout {
+      display: flex;
+      gap: 1.5rem;
+      margin: 2rem auto;
+      max-width: 1500px;
+      align-items: flex-start;
+    }
+
+    .syntax-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.92);
+      border-radius: 18px;
+      padding: 1rem;
+      box-shadow: 0 4px 24px rgba(120,0,180,0.13);
+      border: 2px solid rgba(255,255,255,0.75);
+      position: sticky;
+      top: 1rem;
+    }
+
+    /* For Blog page compatibility */
+    .syntax-nav-year {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg,#E40303,#750787);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      padding: 0.6rem 1rem 0.2rem;
+    }
+
+    .syntax-nav-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #5a0a8a;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1; /* Forces the button text container to the foreground layer */
+    }
+    .syntax-nav-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#750787);
+      background-size: 300% 100%;
+      background-position: 0% 50%;
+      opacity: 0;
+      transition: opacity 0.2s ease, background-position 0.5s ease;
+      border-radius: 10px;
+      z-index: -1; /* Pushes the rainbow background safely behind the text */
+    }
+    .syntax-nav-item:hover::before { opacity: 0.12; background-position: 100% 50%; }
+    .syntax-nav-item.active::before { opacity: 1; background-position: 60% 50%; }
+    .syntax-nav-item.active { color: white; }
+
+    .syntax-content {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,0.93);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 4px 24px rgba(120,0,180,0.12);
+      border: 2px solid rgba(255,255,255,0.7);
+    }
+
+    .syntax-content h4 {
+      background: linear-gradient(90deg,#E40303,#FF8C00,#c8b800,#008026,#004DFF,#750787);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+
+    .intro-box {
+      background: linear-gradient(135deg, rgba(228,3,3,0.06), rgba(117,7,135,0.06));
+      border-left: 4px solid #E40303;
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      color: #333 !important; /* Forces color profile over Tailwind */
+      line-height: 1.8;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg,#E40303,#750787);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      margin: 1.5rem 0 0.4rem;
+    }
+
+    .syntax-content p {
+      color: #444 !important; /* Forces color profile over Tailwind */
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    code {
+      background: rgba(117,7,135,0.08);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88em;
+      color: #750787;
+    }
+
+    .code-block {
+      background: #1a0820;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #e8d8f8;
+      margin-bottom: 0.75rem;
+      overflow-x: auto;
+      white-space: pre;
+      border: 1px solid rgba(200,120,255,0.2);
+      box-shadow: 0 2px 12px rgba(100,0,180,0.15);
+    }
+
+    .output-box {
+      background: #0a1a10;
+      border-radius: 10px;
+      padding: 0.85rem 1.25rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88rem;
+      color: #d4d4d4;
+      margin-bottom: 1.25rem;
+      border-left: 3px solid #008026;
+    }
+    .output-box .out-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #008026;
+      margin-bottom: 0.4rem;
+    }
+    .output-box .out-line { color: #c3e88d; }
+
+    .tip-box {
+      background: linear-gradient(135deg, rgba(255,140,0,0.08), rgba(255,237,0,0.08));
+      border-left: 4px solid #FF8C00;
+      border-radius: 0 10px 10px 0;
+      padding: 0.85rem 1.25rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #444;
+      line-height: 1.6;
+    }
+    .tip-box strong { color: #c87000; }
+
+    .kw  { color: #c792ea; }
+    .ty  { color: #82aaff; }
+    .st  { color: #c3e88d; }
+    .nm  { color: #f78c6c; }
+    .cm  { color: #546e7a; font-style: italic; }
+    .fn  { color: #82aaff; }
+    .op  { color: #89ddff; }
+
+    .try-btn {
+      display: inline-block;
+      margin-top: 0.25rem;
+      padding: 0.55rem 1.35rem;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#750787);
+      background-size: 300% 100%;
+      background-position: 0% 50%;
+      color: white;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 5px 18px rgba(180,0,120,0.3);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .try-btn::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+    .try-btn:hover {
+      background-position: 100% 50%;
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 10px 28px rgba(180,0,180,0.4), 0 0 0 3px rgba(255,255,255,0.3);
+    }
+    .try-btn:hover::before { left: 150%; }
+    .try-btn:active { transform: translateY(-1px) scale(1.01); }
+
+    .content-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#750787);
+      margin: 1.5rem 0;
+      opacity: 0.3;
+      border-radius: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .syntax-layout { flex-direction: column; }
+      .syntax-nav {
+        width: 100%; position: static;
+        display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.5rem;
+      }
+      .syntax-nav-year { width: 100%; padding: 0.4rem 0.5rem 0.1rem; }
+      .syntax-nav-item { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+      .code-block { overflow-x: auto; font-size: 0.78rem; padding: 0.85rem 1rem; }
+      .syntax-content { padding: 1.25rem; }
+    }
+
+    /* === Dark Mode Fixed === */
+    body.dark-mode .syntax-nav {
+      background: rgba(18,5,30,0.88);
+      border: 1.5px solid rgba(200,120,255,0.3);
+      box-shadow: 0 4px 24px rgba(100,0,200,0.25);
+    }
+    body.dark-mode .syntax-nav-item { color: #d090ff; }
+    body.dark-mode .syntax-nav-item.active { color: white; }
+    
+    body.dark-mode .syntax-nav-year {
+      background: linear-gradient(90deg,#ff6060,#c060ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    body.dark-mode .syntax-content {
+      background: rgba(18,5,30,0.88);
+      border: 1.5px solid rgba(200,120,255,0.3);
+      box-shadow: 0 4px 24px rgba(100,0,200,0.2);
+    }
+    body.dark-mode .syntax-content h4 {
+      background: linear-gradient(90deg,#ff6060,#ffb040,#ffe040,#40c060,#6080ff,#c060ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    body.dark-mode .syntax-content p { color: #b8a0d0 !important; }
+    body.dark-mode .intro-box { background: rgba(228,3,3,0.07); color: #e0d8f0 !important; border-left-color: #ff6060; }
+    body.dark-mode .tip-box { background: rgba(255,140,0,0.07); color: #b8a0d0; }
+    body.dark-mode code { background: rgba(200,120,255,0.12); color: #d090ff; }
+    
+    body.dark-mode .section-label {
+      background: linear-gradient(90deg,#ff6060,#c060ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    body.dark-mode .content-divider { opacity: 0.15; }
+    body.dark-mode .code-block {
+      border: 1px solid rgba(200,120,255,0.25);
+      box-shadow: 0 2px 16px rgba(100,0,180,0.2);
+    }
+    body.dark-mode .output-box {
+      border-left: 3px solid #40c060;
+    }
+</style>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -22,8 +312,7 @@
     <a href="index.html" class="flex items-center space-x-2">
       <img src="assets/images/logo.png" alt="Logo" class="h-12 w-12 md:h-20 md:w-20 object-contain">
     </a>
-    <button id="menu-btn" class="md:hidden focus:outline-none">
-    </button>
+    <button id="menu-btn" class="md:hidden focus:outline-none"></button>
     <nav class="navbar-links hidden md:flex flex-wrap justify-evenly text-base md:text-xl font-semibold w-full md:w-auto mt-4 md:mt-0 space-y-2 md:space-y-0 md:space-x-4">
       <a href="index.html" class="navbar-toplink">Home</a>
       <a href="install.html" class="navbar-toplink">Install</a>
@@ -35,26 +324,27 @@
 </header>
 
 <main class="w-full px-4 md:px-8">
-  <!-- PATTERN 2: Full width card (NO images) -->
-  <!-- |-------------------------| -->
-  <div class="card-full">
-    <div class="card-content">
-      <h5>2025</h5>
-      <h5>(The Start)</h5>
-      <a href = "conn.html" class = "link">Conceptualizing GameScript (May 2025)</a>
-      <a href = "syn.html" class = "link">Starting To make the full syntax (July 2025)</a>
-      <a href = "cod.html" class = "link">Starting To Code (September 2025)</a>
-      <a href = "thk.html" class = "link">Thinking upon it (December 2025)</a>
-      <h5>2026</h5>
-      <h5>(The development)</h5>
-      <a href = "code.html" class = "link">Coding it (March 2026)</a>
-      </div>
-    </div>
-  </div>
+  <div class="syntax-layout">
 
+    <!-- Left nav -->
+    <div class="syntax-nav">
+      <div class="syntax-nav-year">2025: The Start</div>
+      <button class="syntax-nav-item active" data-post="conn">Conceptualizing GameScript</button>
+      <button class="syntax-nav-item" data-post="syn">Making the full syntax</button>
+      <button class="syntax-nav-item" data-post="cod">Starting to code</button>
+      <button class="syntax-nav-item" data-post="thk">Thinking upon it</button>
+      <div class="syntax-nav-year" style="margin-top:0.75rem">2026: The Development</div>
+      <button class="syntax-nav-item" data-post="code">Coding it</button>
+      <button class="syntax-nav-item" data-post="make">Making it real</button>
+    </div>
+
+    <!-- Right content -->
+    <div class="syntax-content" id="blog-content"></div>
+
+  </div>
 </main>
 
-<!-- Bottom Bar -->
+<!-- Footer -->
 <footer class="bot-bar mt-10">
   <div class="max-w-7xl mx-auto px-6 flex flex-col items-center text-center space-y-4">
     <img src="assets/images/logo.png" alt="logo" class="pt-6 h-24 w-24 md:h-40 md:w-40 object-contain rounded-full">
@@ -63,6 +353,94 @@
     <h1 class="text-sm text-white">A Language by Ranveer Singh</h1>
   </div>
 </footer>
+
+<script>
+const posts = {
+  conn: {
+    title: 'Conceptualizing GameScript',
+    date: 'May 2025',
+    body: `I first started thinking of GameScript way back in May of 2025. It was during my school's summer holidays, I was bored and wanted to code a game. I was trying to code chess but with a pixel art style, using p5.js in JavaScript.
+It was only then I realised that JavaScript, in all its glory, is interpreted. This isn't a bad thing, but it can cause unpredictable behaviour. That made me wonder: what if there was a language that's as simple as JavaScript or Python, but also compiled like C++?
+This led me to think about how languages actually function and behave underneath the surface. After that discovery I realised I could try to make one myself.
+I went and talked to some friends about the things they didn't like in existing languages. I thought about it and started designing a whole syntax. Looking back, a lot of those early ideas were just renaming things, like <code>display()</code> instead of <code>print()</code>. What was I thinking?
+Later I settled my ideas and focused on making the language accessible and easy, offering multiple syntaxes so it's easy to adapt. I didn't yet code any of it, just let the ideas sit there and moved on.`
+  },
+  syn: {
+    title: 'Starting to Make the Full Syntax',
+    date: 'July 2025',
+    body: `This is when I REALLY started to think about the syntax of the language. I wrote it down, tried it out, and checked if it felt right.
+I was deciding between indentation and curly braces. Although braces are easier to implement, indentation looked cleaner, so indentation won.
+There was also a debate in my mind about whether to add <code>:</code> like Python or not. Although it looked more defining, I decided against it and went for almost no visual clutter.
+This was also when I decided the language would be statically typed to improve performance. Instead of <code>a = 5</code> or <code>var a = 5</code>, I went for <code>int a = 5</code>.
+I defined the core literal types: Integers (<code>int</code>), Floating numbers (<code>flt</code>), Strings (<code>str</code>), Lists (<code>list</code>), Dictionaries (<code>dict</code>), with more to be decided later.
+Although the language was directed towards game developers (especially indie developers), it was never meant to be ONLY for them. The motto became: <strong>"Making it simple."</strong>`
+  },
+  cod: {
+    title: 'Starting to Code',
+    date: 'September 2025',
+    body: `I spent all of August learning C++ so I could start working on the language, which by this point had a name: <strong>GameScript</strong> .
+I started coding a C++ compiler to compile <code>.gs</code> (GameScript) files. It went horribly at first, but I pushed through. This was a huge learning curve and at times I felt like I wasn't going to make it.
+Eventually, after a while, I gave up completely. This led me to a lot of self-doubt, I questioned whether I should even be making GameScript at all. I asked people around me for their thoughts.
+In the end I decided to pause the idea.`
+  },
+  thk: {
+    title: 'Thinking Upon It',
+    date: 'December 2025',
+    body: `I started tinkering with the idea of GameScript again. Who were the people it could actually help? The answer was indie developers, it could genuinely help them.
+I thought I should give it another shot and started to code in C++ again. During that time I stumbled upon the concept of <strong>self-hosting</strong> languages, languages that compile themselves (like Go and C++).
+I wondered if I could make GameScript self-hosting. The way it works is: first create a simple language compiler, then use that language to write a compiler for a more complex language, and then finally use <strong>that</strong> to write a compiler for a fully matured language.
+The problem was I didn't have time for it. It was quite a long process.`
+  },
+  code: {
+    title: 'Coding It',
+    date: 'March 2026',
+    body: `This is when I actually started to code the language itself.
+I first made a simple language using C++, which I code-named <strong>hoax</strong>. Then I created a language called <strong>semi</strong> using hoax, a semi-matured language. Finally, I am now working on the compiler for <code>.gs</code> using semi.
+This has been the biggest breakthrough yet, though it is taking a lot of time and energy. I'm happy to spend that time though, I've been genuinely enjoying making this language.
+The syntax is finalised and should be visible in the Syntax tab in no time. I'll keep working on it, and the Home page will let you know when it's usable.
+This is my biggest project yet across all my programming years, so wish me luck. Have a nice day!`
+  },
+  make: {
+    title: 'Making it real',
+    date: 'April/May 2026',
+    body: `Had been coding for so long now, this is finally coming along. <br>After a few iterations of making compilers upon compilers, I am finally at refining it for real. It seems to be a big step. <br>It's been successfully boostrapped. At the moment I'm making the compiler faster and better while also extensibely working on the error messages to be more like rust's. I've always adored rust's error messages so I'd love to make mine like theirs.<br> <strong>ALSOO</strong> been working on the <strong>GameScript PlayGround</strong> recently. It's been a fun time and a but exhaustive one at that. Anyways, Bye!`
+  }
+};
+
+function render(key) {
+  const post = posts[key];
+  // Split body into paragraphs on blank lines or \n\n, otherwise line breaks
+  const paragraphs = post.body.split('\n').map(line => line.trim()).filter(l => l.length > 0);
+
+  let html = `<h4>${post.title}</h4>`;
+  html += `<div class="intro-box"><strong>${post.date}</strong></div>`;
+
+  paragraphs.forEach((para, i) => {
+    if (i > 0) html += '';
+    html += `<p>${para}</p>`;
+  });
+
+  document.getElementById('blog-content').innerHTML = html;
+}
+
+document.querySelectorAll('.syntax-nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.syntax-nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render(btn.dataset.post);
+  });
+});
+
+// Load from URL param or default
+const params = new URLSearchParams(location.search);
+const initial = params.get('post') || 'conn';
+const initialBtn = document.querySelector(`[data-post="${initial}"]`);
+if (initialBtn) {
+  document.querySelectorAll('.syntax-nav-item').forEach(b => b.classList.remove('active'));
+  initialBtn.classList.add('active');
+}
+render(initial);
+</script>
 
 </body>
 </html>

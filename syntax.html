@@ -20,12 +20,26 @@
     .syntax-nav {
       width: 220px;
       flex-shrink: 0;
-      background: white;
-      border-radius: 16px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 18px;
       padding: 1rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      box-shadow: 0 4px 24px rgba(120,0,180,0.13);
+      border: 2px solid rgba(255,255,255,0.75);
       position: sticky;
       top: 1rem;
+    }
+
+    /* For Blog page compatibility */
+    .syntax-nav-year {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg,#E40303,#750787);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      padding: 0.6rem 1rem 0.2rem;
     }
 
     .syntax-nav-item {
@@ -36,40 +50,61 @@
       border-radius: 10px;
       font-weight: 600;
       font-size: 0.95rem;
-      color: #154f55;
+      color: #5a0a8a;
       background: transparent;
       border: none;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1; /* 1️⃣ ADD THIS: Forces the button text container to the foreground layer */
     }
-    .syntax-nav-item:hover { background: rgba(240,106,77,0.08); }
-    .syntax-nav-item.active { background: #f06a4d; color: white; }
+    .syntax-nav-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#750787);
+      background-size: 300% 100%;
+      background-position: 0% 50%;
+      opacity: 0;
+      transition: opacity 0.2s ease, background-position 0.5s ease;
+      border-radius: 10px;
+      z-index: -1; /* 2️⃣ CHANGE THIS FROM 0 TO -1: Pushes the rainbow background behind the text */
+    }
+    .syntax-nav-item:hover::before { opacity: 0.12; background-position: 100% 50%; }
+    .syntax-nav-item.active::before { opacity: 1; background-position: 60% 50%; }
+    .syntax-nav-item.active { color: white; }
 
     .syntax-content {
       flex: 1;
       min-width: 0;
-      background: white;
-      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      border-radius: 18px;
       padding: 2rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      box-shadow: 0 4px 24px rgba(120,0,180,0.12);
+      border: 2px solid rgba(255,255,255,0.7);
     }
 
     .syntax-content h4 {
-      color: #154f55;
-      font-size: 1.4rem;
-      font-weight: 700;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#c8b800,#008026,#004DFF,#750787);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.5rem;
+      font-weight: 800;
       margin-bottom: 0.75rem;
     }
 
     .intro-box {
-      background: #f0f9f9;
-      border-left: 4px solid #3fafa4;
-      border-radius: 0 8px 8px 0;
+      background: linear-gradient(135deg, rgba(228,3,3,0.06), rgba(117,7,135,0.06));
+      border-left: 4px solid #E40303;
+      border-radius: 0 10px 10px 0;
       padding: 1rem 1.25rem;
       margin-bottom: 1.5rem;
       font-size: 0.95rem;
-      color: #333;
-      line-height: 1.6;
+      color: #333 !important; /* Forces color profile over Tailwind */
+      line-height: 1.8;
     }
 
     .section-label {
@@ -77,69 +112,75 @@
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #3fafa4;
+      background: linear-gradient(90deg,#E40303,#750787);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
       margin: 1.5rem 0 0.4rem;
     }
 
     .syntax-content p {
-      color: #555;
+      color: #444 !important; /* Forces color profile over Tailwind */
       margin-bottom: 0.75rem;
       font-size: 0.95rem;
-      line-height: 1.6;
+      line-height: 1.8;
     }
 
     code {
-      background: #f0f0f0;
+      background: rgba(117,7,135,0.08);
       border-radius: 4px;
       padding: 0.1em 0.35em;
       font-family: 'Fira Code', monospace;
       font-size: 0.88em;
-      color: #154f55;
+      color: #750787;
     }
 
     .code-block {
-      background: #1e1e1e;
-      border-radius: 10px;
+      background: #1a0820;
+      border-radius: 12px;
       padding: 1.25rem 1.5rem;
       font-family: 'Fira Code', monospace;
       font-size: 0.9rem;
       line-height: 1.7;
-      color: #d4d4d4;
+      color: #e8d8f8;
       margin-bottom: 0.75rem;
       overflow-x: auto;
       white-space: pre;
+      border: 1px solid rgba(200,120,255,0.2);
+      box-shadow: 0 2px 12px rgba(100,0,180,0.15);
     }
 
     .output-box {
-      background: #1e1e1e;
+      background: #0a1a10;
       border-radius: 10px;
       padding: 0.85rem 1.25rem;
       font-family: 'Fira Code', monospace;
       font-size: 0.88rem;
       color: #d4d4d4;
       margin-bottom: 1.25rem;
-      border-left: 3px solid #3fafa4;
+      border-left: 3px solid #008026;
     }
     .output-box .out-label {
       font-size: 0.7rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #3fafa4;
+      color: #008026;
       margin-bottom: 0.4rem;
     }
     .output-box .out-line { color: #c3e88d; }
 
     .tip-box {
-      background: #fff8f0;
-      border-left: 4px solid #f06a4d;
-      border-radius: 0 8px 8px 0;
+      background: linear-gradient(135deg, rgba(255,140,0,0.08), rgba(255,237,0,0.08));
+      border-left: 4px solid #FF8C00;
+      border-radius: 0 10px 10px 0;
       padding: 0.85rem 1.25rem;
       margin-top: 1.5rem;
       font-size: 0.9rem;
-      color: #555;
+      color: #444;
       line-height: 1.6;
     }
-    .tip-box strong { color: #f06a4d; }
+    .tip-box strong { color: #c87000; }
 
     .kw  { color: #c792ea; }
     .ty  { color: #82aaff; }
@@ -152,117 +193,111 @@
     .try-btn {
       display: inline-block;
       margin-top: 0.25rem;
-      padding: 0.5rem 1.25rem;
-      background: #f06a4d;
+      padding: 0.55rem 1.35rem;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#750787);
+      background-size: 300% 100%;
+      background-position: 0% 50%;
       color: white;
       border-radius: 999px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.9rem;
       text-decoration: none;
-      transition: opacity 0.15s;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 5px 18px rgba(180,0,120,0.3);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .try-btn:hover { opacity: 0.85; }
+    .try-btn::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+    .try-btn:hover {
+      background-position: 100% 50%;
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 10px 28px rgba(180,0,180,0.4), 0 0 0 3px rgba(255,255,255,0.3);
+    }
+    .try-btn:hover::before { left: 150%; }
+    .try-btn:active { transform: translateY(-1px) scale(1.01); }
 
     .content-divider {
       border: none;
-      border-top: 1px solid #f0f0f0;
+      height: 2px;
+      background: linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#004DFF,#750787);
       margin: 1.5rem 0;
+      opacity: 0.3;
+      border-radius: 1px;
     }
 
     @media (max-width: 768px) {
-  .syntax-layout { flex-direction: column; }
-  .syntax-nav {
-    width: 100%; position: static;
-    display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.5rem;
-  }
-  .syntax-nav-item { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
-  .code-block {
-    overflow-x: auto;
-    font-size: 0.78rem;
-    padding: 0.85rem 1rem;
-  }
-  .syntax-content {
-    padding: 1.25rem;
-  }
-}
-    /* === Syntax page dark mode === */
-body.dark-mode .syntax-nav {
-    background: rgba(30, 30, 34, 0.85);
-    border: 1px solid rgba(63, 175, 164, 0.3);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-}
+      .syntax-layout { flex-direction: column; }
+      .syntax-nav {
+        width: 100%; position: static;
+        display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.5rem;
+      }
+      .syntax-nav-year { width: 100%; padding: 0.4rem 0.5rem 0.1rem; }
+      .syntax-nav-item { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+      .code-block { overflow-x: auto; font-size: 0.78rem; padding: 0.85rem 1rem; }
+      .syntax-content { padding: 1.25rem; }
+    }
 
-body.dark-mode .syntax-nav-item {
-    color: #5ecfbf;
-}
-
-body.dark-mode .syntax-nav-item:hover {
-    background: rgba(240, 106, 77, 0.12);
-}
-
-body.dark-mode .syntax-content {
-    background: rgba(30, 30, 34, 0.85);
-    border: 1px solid rgba(63, 175, 164, 0.3);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .syntax-content h4 {
-    color: #5ecfbf;
-}
-
-body.dark-mode .syntax-content p {
-    color: #a0a0b0;
-}
-
-body.dark-mode .intro-box {
-    background: rgba(63, 175, 164, 0.08);
-    color: #c8c8d4;
-}
-
-body.dark-mode .tip-box {
-    background: rgba(240, 106, 77, 0.08);
-    color: #a0a0b0;
-}
-
-body.dark-mode code {
-    background: rgba(255, 255, 255, 0.08);
-    color: #5ecfbf;
-}
-
-body.dark-mode .content-divider {
-    border-top-color: rgba(63, 175, 164, 0.15);
-}
-
-body.dark-mode .section-label {
-    color: #3fafa4;
-}
-/* === Playground dark mode borders === */
-body.dark-mode .CodeMirror {
-    border: 1px solid rgba(63, 175, 164, 0.3);
-    box-shadow: 0 0 20px rgba(63, 175, 164, 0.05);
-}
-
-body.dark-mode .output-content {
-    border: 1px solid rgba(240, 106, 77, 0.3);
-    box-shadow: 0 0 20px rgba(240, 106, 77, 0.05);
-}
-body.dark-mode .code-block {
-    border: 1px solid rgba(63, 175, 164, 0.3);
-    box-shadow: 0 0 20px rgba(63, 175, 164, 0.05);
-}
-
-body.dark-mode .output-box {
-    border: 1px solid rgba(240, 106, 77, 0.3);
-    box-shadow: 0 0 20px rgba(240, 106, 77, 0.05);
-    border-left: 3px solid #f06a4d;
-}
-body.dark-mode .syntax-nav-item.active {
-    background: transparent;
-    color: #5ecfbf;
-    border: 1px solid rgba(63, 175, 164, 0.5);
-    box-shadow: 0 0 12px rgba(63, 175, 164, 0.1);
-}
-  </style>
+    /* === Dark Mode Fixed === */
+    body.dark-mode .syntax-nav {
+      background: rgba(18,5,30,0.88);
+      border: 1.5px solid rgba(200,120,255,0.3);
+      box-shadow: 0 4px 24px rgba(100,0,200,0.25);
+    }
+    body.dark-mode .syntax-nav-item { color: #d090ff; }
+    body.dark-mode .syntax-nav-item.active { color: white; }
+    
+    body.dark-mode .syntax-nav-year {
+      background: linear-gradient(90deg,#ff6060,#c060ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    body.dark-mode .syntax-content {
+      background: rgba(18,5,30,0.88);
+      border: 1.5px solid rgba(200,120,255,0.3);
+      box-shadow: 0 4px 24px rgba(100,0,200,0.2);
+    }
+    body.dark-mode .syntax-content h4 {
+      background: linear-gradient(90deg,#ff6060,#ffb040,#ffe040,#40c060,#6080ff,#c060ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    body.dark-mode .syntax-content p { color: #b8a0d0 !important; }
+    body.dark-mode .intro-box { background: rgba(228,3,3,0.07); color: #e0d8f0 !important; border-left-color: #ff6060; }
+    body.dark-mode .tip-box { background: rgba(255,140,0,0.07); color: #b8a0d0; }
+    body.dark-mode code { background: rgba(200,120,255,0.12); color: #d090ff; }
+    
+    body.dark-mode .section-label {
+      background: linear-gradient(90deg,#ff6060,#c060ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    body.dark-mode .content-divider { opacity: 0.15; }
+    body.dark-mode .code-block {
+      border: 1px solid rgba(200,120,255,0.25);
+      box-shadow: 0 2px 16px rgba(100,0,180,0.2);
+    }
+    body.dark-mode .output-box {
+      border-left: 3px solid #40c060;
+    }
+</style>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -327,10 +362,10 @@ const sections = {
     blocks: [
       {
         label: 'The 4 basic types',
-        explain: '<code>int</code> stores whole numbers, <code>dec</code> stores decimals, <code>word</code> stores text, and <code>bool</code> stores <code>true</code> or <code>false</code>.',
+        explain: '<code>int</code> stores whole numbers, <code>flt</code> stores decimals, <code>str</code> stores text, and <code>bool</code> stores <code>true</code> or <code>false</code>.',
         code: `<span class="kw">int</span>  age  = <span class="nm">18</span>
-<span class="kw">dec</span>  pi   = <span class="nm">3.14</span>
-<span class="kw">word</span> name = <span class="st">"GameScript"</span>
+<span class="kw">flt</span>  pi   = <span class="nm">3.14</span>
+<span class="kw">str</span> name = <span class="st">"GameScript"</span>
 <span class="kw">bool</span> on   = <span class="kw">true</span>
 <span class="fn">print</span>(age)
 <span class="fn">print</span>(pi)
@@ -349,7 +384,7 @@ x = <span class="nm">10</span>
         example: `int x = 5\nx = 10\nprint(x)`
       }
     ],
-    tip: 'You only write the type keyword (<code>int</code>, <code>word</code>, etc.) the <strong>first time</strong> you declare the variable. After that, just use the name.'
+    tip: 'You only write the type keyword (<code>int</code>, <code>str</code>, etc.) the <strong>first time</strong> you declare the variable. After that, just use the name.'
   },
 
   arithmetic: {
@@ -370,43 +405,43 @@ x = <span class="nm">10</span>
       {
         label: 'Exponent **',
         explain: '<code>**</code> raises a number to a power. <code>2 ** 8</code> means 2 to the power of 8, which is 256.',
-        code: `<span class="kw">dec</span> result = <span class="nm">2.0</span> <span class="op">**</span> <span class="nm">8</span>
+        code: `<span class="kw">flt</span> result = <span class="nm">2.0</span> <span class="op">**</span> <span class="nm">8</span>
 <span class="fn">print</span>(result)`,
         output: ['256'],
-        example: `dec result = 2.0 ** 8\nprint(result)`
+        example: `flt result = 2.0 ** 8\nprint(result)`
       }
     ],
-    tip: 'Use <code>int</code> for whole number results and <code>dec</code> when you expect decimals.'
+    tip: 'Use <code>int</code> for whole number results and <code>flt</code> when you expect decimals.'
   },
 
   strings: {
     title: 'Strings',
-    intro: 'A string (called <code>word</code> in GameScript) is a piece of text. Wrap it in double quotes. You can embed variable values directly inside a string using <code>{}</code>.',
+    intro: 'A string (called <code>str</code> in GameScript) is a piece of text. Wrap it in double quotes. You can embed variable values directly inside a string using <code>{}</code>.',
     blocks: [
       {
         label: 'Basic string',
-        explain: 'Wrap text in double quotes and assign it to a <code>word</code> variable.',
-        code: `<span class="kw">word</span> greeting = <span class="st">"Hello, world!"</span>
+        explain: 'Wrap text in double quotes and assign it to a <code>str</code> variable.',
+        code: `<span class="kw">str</span> greeting = <span class="st">"Hello, world!"</span>
 <span class="fn">print</span>(greeting)`,
         output: ['Hello, world!'],
-        example: `word greeting = "Hello, world!"\nprint(greeting)`
+        example: `str greeting = "Hello, world!"\nprint(greeting)`
       },
       {
         label: 'String interpolation',
         explain: 'Put a variable name inside <code>{}</code> inside a string — GameScript replaces it with its value automatically.',
-        code: `<span class="kw">word</span> name = <span class="st">"Ranveer"</span>
+        code: `<span class="kw">str</span> name = <span class="st">"Ranveer"</span>
 <span class="kw">int</span>  age  = <span class="nm">17</span>
 <span class="fn">print</span>(<span class="st">"My name is {name} and I am {age}."</span>)`,
         output: ['My name is Ranveer and I am 17.'],
-        example: `word name = "Ranveer"\nint age = 17\nprint("My name is {name} and I am {age}.")`
+        example: `str name = "Ranveer"\nint age = 17\nprint("My name is {name} and I am {age}.")`
       },
       {
         label: 'Pure string — no interpolation',
         explain: 'Add a <code>p</code> before the opening quote to treat curly braces as literal text.',
-        code: `<span class="kw">word</span> raw = <span class="kw">p</span><span class="st">"{name} stays as-is"</span>
+        code: `<span class="kw">str</span> raw = <span class="kw">p</span><span class="st">"{name} stays as-is"</span>
 <span class="fn">print</span>(raw)`,
         output: ['{name} stays as-is'],
-        example: `word raw = p"{name} stays as-is"\nprint(raw)`
+        example: `str raw = p"{name} stays as-is"\nprint(raw)`
       }
     ],
     tip: 'Interpolation only works inside regular <code>"..."</code> strings, not <code>p"..."</code> ones.'
@@ -505,11 +540,11 @@ x = <span class="nm">10</span>
       {
         label: 'Loop over a list',
         explain: 'You can loop over every item in a list directly.',
-        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> colours = [<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>]
-<span class="kw">loop</span> <span class="kw">word</span> c <span class="kw">in</span> colours
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">str</span><span class="op">&gt;</span> colours = [<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>]
+<span class="kw">loop</span> <span class="kw">str</span> c <span class="kw">in</span> colours
     <span class="fn">print</span>(c)`,
         output: ['red', 'green', 'blue'],
-        example: `list<word> colours = ["red", "green", "blue"]\nloop word c in colours\n    print(c)`
+        example: `list<str> colours = ["red", "green", "blue"]\nloop str c in colours\n    print(c)`
       },
       {
         label: 'break and continue',
@@ -550,24 +585,24 @@ nums[<span class="nm">1</span>] = <span class="nm">99</span>
       {
         label: 'List methods',
         explain: '<code>.append()</code> adds to the end, <code>.remove(index)</code> deletes by position, <code>.len()</code> returns the count.',
-        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">str</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
 fruits.<span class="fn">append</span>(<span class="st">"cherry"</span>)
 <span class="fn">print</span>(fruits.<span class="fn">len</span>())
 fruits.<span class="fn">remove</span>(<span class="nm">0</span>)
 <span class="fn">print</span>(fruits)`,
         output: ['3', '[banana, cherry]'],
-        example: `list<word> fruits = ["apple", "banana"]\nfruits.append("cherry")\nprint(fruits.len())\nfruits.remove(0)\nprint(fruits)`
+        example: `list<str> fruits = ["apple", "banana"]\nfruits.append("cherry")\nprint(fruits.len())\nfruits.remove(0)\nprint(fruits)`
       },
       {
         label: 'Checking membership: has',
         explain: 'Use <code>has</code> to check if a value is in a list, and <code>not has</code> for the opposite.',
-        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">word</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
+        code: `<span class="kw">list</span><span class="op">&lt;</span><span class="ty">str</span><span class="op">&gt;</span> fruits = [<span class="st">"apple"</span>, <span class="st">"banana"</span>]
 <span class="kw">if</span> fruits <span class="kw">has</span> <span class="st">"apple"</span>
     <span class="fn">print</span>(<span class="st">"found it"</span>)
 <span class="kw">if</span> fruits <span class="kw">not has</span> <span class="st">"mango"</span>
     <span class="fn">print</span>(<span class="st">"no mango"</span>)`,
         output: ['found it', 'no mango'],
-        example: `list<word> fruits = ["apple", "banana"]\nif fruits has "apple"\n    print("found it")\nif fruits not has "mango"\n    print("no mango")`
+        example: `list<str> fruits = ["apple", "banana"]\nif fruits has "apple"\n    print("found it")\nif fruits not has "mango"\n    print("no mango")`
       }
     ],
     tip: 'Lists are zero-indexed — the first item is at index <code>0</code>, not <code>1</code>.'
@@ -575,32 +610,32 @@ fruits.<span class="fn">remove</span>(<span class="nm">0</span>)
 
   dicts: {
     title: 'Dicts',
-    intro: 'A dict (dictionary) stores key-value pairs — like a real dictionary where you look up a word to get its meaning. You declare both the key type and the value type.',
+    intro: 'A dict (dictionary) stores key-value pairs — like a real dictionary where you look up a str to get its meaning. You declare both the key type and the value type.',
     blocks: [
       {
         label: 'Creating a dict',
         explain: 'Use <code>dict&lt;keyType, valueType&gt;</code> and set pairs with <code>"key" = value</code> inside <code>{}</code>.',
-        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"alice"</span> = <span class="nm">25</span>, <span class="st">"bob"</span> = <span class="nm">30</span>}
+        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">str</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"alice"</span> = <span class="nm">25</span>, <span class="st">"bob"</span> = <span class="nm">30</span>}
 <span class="fn">print</span>(ages[<span class="st">"alice"</span>])`,
         output: ['25'],
-        example: `dict<word, int> ages = {"alice" = 25, "bob" = 30}\nprint(ages["alice"])`
+        example: `dict<str, int> ages = {"alice" = 25, "bob" = 30}\nprint(ages["alice"])`
       },
       {
         label: 'Adding and updating',
         explain: 'Assign to a new key to add it, or an existing key to update it.',
-        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"alice"</span> = <span class="nm">25</span>}
+        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">str</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"alice"</span> = <span class="nm">25</span>}
 ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
 <span class="fn">print</span>(ages[<span class="st">"charlie"</span>])`,
         output: ['22'],
-        example: `dict<word, int> ages = {"alice" = 25}\nages["charlie"] = 22\nprint(ages["charlie"])`
+        example: `dict<str, int> ages = {"alice" = 25}\nages["charlie"] = 22\nprint(ages["charlie"])`
       },
       {
         label: 'Checking if a key exists',
         explain: 'Use <code>.has(key)</code> before accessing a key you are not sure about.',
-        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">word</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"bob"</span> = <span class="nm">30</span>}
+        code: `<span class="kw">dict</span><span class="op">&lt;</span><span class="ty">str</span>, <span class="ty">int</span><span class="op">&gt;</span> ages = {<span class="st">"bob"</span> = <span class="nm">30</span>}
 <span class="kw">if</span> ages.<span class="fn">has</span>(<span class="st">"bob"</span>) <span class="kw">then</span> <span class="fn">print</span>(<span class="st">"bob is here"</span>)`,
         output: ['bob is here'],
-        example: `dict<word, int> ages = {"bob" = 30}\nif ages.has("bob") then print("bob is here")`
+        example: `dict<str, int> ages = {"bob" = 30}\nif ages.has("bob") then print("bob is here")`
       }
     ],
     tip: 'Always use <code>.has()</code> before accessing a key you are not sure about — missing keys cause errors.'
@@ -623,12 +658,12 @@ ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
       {
         label: 'void — no return value',
         explain: 'Use <code>void</code> when the function just does something without returning a value.',
-        code: `<span class="kw">fn</span> <span class="ty">void</span> <span class="fn">greet</span>(<span class="ty">word</span> name)
+        code: `<span class="kw">fn</span> <span class="ty">void</span> <span class="fn">greet</span>(<span class="ty">str</span> name)
     <span class="fn">print</span>(<span class="st">"Hello, {name}!"</span>)
 
 <span class="fn">greet</span>(<span class="st">"world"</span>)`,
         output: ['Hello, world!'],
-        example: `fn void greet(word name)\n    print("Hello, {name}!")\n\ngreet("world")`
+        example: `fn void greet(str name)\n    print("Hello, {name}!")\n\ngreet("world")`
       },
       {
         label: 'const and global',
@@ -657,10 +692,10 @@ ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
         code: `<span class="kw">try</span>
     <span class="kw">int</span> n = <span class="fn">toInt</span>(<span class="st">"oops"</span>)
     <span class="fn">print</span>(n)
-<span class="kw">catch</span> (<span class="ty">word</span> err)
+<span class="kw">catch</span> (<span class="ty">str</span> err)
     <span class="fn">print</span>(<span class="st">"Error: {err}"</span>)`,
         output: ['Error: cannot convert "oops" to int'],
-        example: `try\n    int n = toInt("oops")\n    print(n)\ncatch (word err)\n    print("Error: {err}")`
+        example: `try\n    int n = toInt("oops")\n    print(n)\ncatch (str err)\n    print("Error: {err}")`
       },
       {
         label: 'Type conversion built-ins',
@@ -681,15 +716,15 @@ ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
     blocks: [
       {
         label: 'Reading text',
-        explain: 'Assign <code>take()</code> to a <code>word</code> variable. Whatever the user types is stored as-is.',
-        code: `<span class="kw">word</span> name = <span class="fn">take</span>(<span class="st">"Your name: "</span>)
+        explain: 'Assign <code>take()</code> to a <code>str</code> variable. Whatever the user types is stored as-is.',
+        code: `<span class="kw">str</span> name = <span class="fn">take</span>(<span class="st">"Your name: "</span>)
 <span class="fn">print</span>(<span class="st">"Hello, {name}!"</span>)`,
         output: ['Your name: &nbsp;<em style="color:#888">(type and press Enter)</em>', 'Hello, ...!'],
-        example: `word name = take("Your name: ")\nprint("Hello, {name}!")`
+        example: `str name = take("Your name: ")\nprint("Hello, {name}!")`
       },
       {
         label: 'Reading a number',
-        explain: 'Assign to <code>int</code> or <code>dec</code> — GameScript converts the input automatically.',
+        explain: 'Assign to <code>int</code> or <code>flt</code> — GameScript converts the input automatically.',
         code: `<span class="kw">int</span> age = <span class="fn">take</span>(<span class="st">"Your age: "</span>)
 <span class="fn">print</span>(<span class="st">"You are {age} years old."</span>)`,
         output: ['Your age: &nbsp;<em style="color:#888">(type a number)</em>', 'You are ... years old.'],
@@ -709,10 +744,10 @@ ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
         code: `<span class="kw">try</span>
     <span class="kw">int</span> n = <span class="fn">take</span>(<span class="st">"Enter a number: "</span>)
     <span class="fn">print</span>(<span class="st">"You entered {n}"</span>)
-<span class="kw">catch</span> (<span class="ty">word</span> err)
+<span class="kw">catch</span> (<span class="ty">str</span> err)
     <span class="fn">print</span>(<span class="st">"That wasn't a number!"</span>)`,
         output: ['Enter a number: &nbsp;<em style="color:#888">(type something)</em>', '...'],
-        example: `try\n    int n = take("Enter a number: ")\n    print("You entered {n}")\ncatch (word err)\n    print("That wasn't a number!")`
+        example: `try\n    int n = take("Enter a number: ")\n    print("You entered {n}")\ncatch (str err)\n    print("That wasn't a number!")`
       }
     ],
     tip: '<code>take()</code> pauses execution inline — you type right in the output panel and press <strong>Enter</strong> to continue.'
@@ -726,7 +761,7 @@ ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
         label: 'Ternary operator ?:',
         explain: 'A one-line if/else that produces a value. Format: <code>condition ? valueIfTrue : valueIfFalse</code>.',
         code: `<span class="kw">int</span> x = <span class="nm">10</span>
-<span class="kw">word</span> result = x <span class="op">></span> <span class="nm">0</span> <span class="op">?</span> <span class="st">"positive"</span> <span class="op">:</span> <span class="st">"negative"</span>
+<span class="kw">str</span> result = x <span class="op">></span> <span class="nm">0</span> <span class="op">?</span> <span class="st">"positive"</span> <span class="op">:</span> <span class="st">"negative"</span>
 <span class="fn">print</span>(result)`,
         output: ['positive'],
         example: `int x = 10\nword result = x > 0 ? "positive" : "negative"\nprint(result)`
@@ -734,11 +769,11 @@ ages[<span class="st">"charlie"</span>] = <span class="nm">22</span>
       {
         label: 'Null coalescing ??',
         explain: '<code>??</code> returns the left side if it is not <code>null</code>, otherwise the right side. Great for default values.',
-        code: `<span class="kw">word</span> input = <span class="kw">null</span>
-<span class="kw">word</span> name = input <span class="op">??</span> <span class="st">"Guest"</span>
+        code: `<span class="kw">str</span> input = <span class="kw">null</span>
+<span class="kw">str</span> name = input <span class="op">??</span> <span class="st">"Guest"</span>
 <span class="fn">print</span>(name)`,
         output: ['Guest'],
-        example: `word input = null\nword name = input ?? "Guest"\nprint(name)`
+        example: `str input = null\nword name = input ?? "Guest"\nprint(name)`
       },
       {
         label: 'Augmented assignment',
